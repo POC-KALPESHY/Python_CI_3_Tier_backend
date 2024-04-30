@@ -9,9 +9,9 @@ from src.___init__ import app
 
 
 @app.route("/user",methods = ['GET'])
-def hello():
+def fetch_detail():
     # cursor, connection = get_cursor()
-    print("Inside To get basic set up details")
+    print("Inside fetch detail function.")
     try:
         if request.method == 'GET':
             # query = """ select * from api.api_user """
@@ -20,7 +20,8 @@ def hello():
             #     cursor=cursor
             # )
             user_details = {
-                "name":"onkar"
+                "name":"onkar",
+                "age":24
             }
             return make_response(jsonify(user_details))
     except Exception as e:
