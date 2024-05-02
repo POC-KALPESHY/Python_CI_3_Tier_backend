@@ -5,11 +5,12 @@ from flask import (
 )
 from src.___init__ import app
 # from src.utils.db_function import get_cursor,get_object
+from src.utils import constant as settings
 
 
 
-@app.route("/user",methods = ['GET'])
-def fetch_detail():
+@app.route("/home",methods = ['GET'])
+def home_detail():
     # cursor, connection = get_cursor()
     print("Inside fetch detail function.")
     try:
@@ -19,26 +20,25 @@ def fetch_detail():
             #     query=query,
             #     cursor=cursor
             # )
-            user_details = {
-  "articles": [
-    {
-      "id": 1,
-      "title": "Breaking News: Scientists Discover New Species of Bird",
-      "content": "Moon Holds More Water Ice Than Expected, Especially at North Pole."
-    },
-    {
-      "id": 2,
-      "title": "Sports: IPL match between.",
-      "content": "Punjab Kings defeats Chennai Super Kings by seven wickets."
-    },
-    {
-      "id": 3,
-      "title": "Political: Powell talks about the interest rate.",
-      "content": "BackBack US Fed policy: Political stability to outweigh higher interest rate concerns for Indian investors."
-    }
-  ]
-}
+            home_page_data = settings.HOME_PAGE_DATA
 
-            return make_response(jsonify(user_details))
+            return make_response(jsonify(home_page_data))
+    except Exception as e:
+        print(e)
+
+@app.route("/sports",methods = ['GET'])
+def sport_detail():
+    # cursor, connection = get_cursor()
+    print("Inside sport detail function.")
+    try:
+        if request.method == 'GET':
+            # query = """ select * from api.api_user """
+            # user_details = get_object(
+            #     query=query,
+            #     cursor=cursor
+            # )
+            sport_page_data = settings.SPORT_PAGE_DATA
+
+            return make_response(jsonify(sport_page_data))
     except Exception as e:
         print(e)
