@@ -20,9 +20,25 @@ def fetch_detail():
             #     cursor=cursor
             # )
             user_details = {
-                "name":"onkar",
-                "age":24
-            }
+  "articles": [
+    {
+      "id": 1,
+      "title": "Breaking News: Scientists Discover New Species of Bird",
+      "content": "Moon Holds More Water Ice Than Expected, Especially at North Pole."
+    },
+    {
+      "id": 2,
+      "title": "Sports: IPL match between.",
+      "content": "Punjab Kings defeats Chennai Super Kings by seven wickets."
+    },
+    {
+      "id": 3,
+      "title": "Political: Powell talks about the interest rate.",
+      "content": "BackBack US Fed policy: Political stability to outweigh higher interest rate concerns for Indian investors."
+    }
+  ]
+}
+
             return make_response(jsonify(user_details))
     except Exception as e:
         print(e)
