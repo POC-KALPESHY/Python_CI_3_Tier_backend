@@ -6,9 +6,11 @@ test:
   image: python:3
   script:
     - pip install pytest pytest-cov
-    # No need to run pytest with coverage, just install the dependencies
+    # Assuming coverage.xml is generated locally in the 'test' directory
+    - mv test/coverage.xml . # Move coverage.xml to the root directory
+    - pytest --cov=src/routes/routes.py --cov=test/test.py --cov-report term --cov-report xml:coverage.xml
   coverage: /TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/
   artifacts:
     reports:
       junit: test/test-reports/TEST-ApiTest-20240503121624.xml
-      coverage: test/coverage.xml
+      # coverage: coverage.xml # Use the coverage.xml from the root directory
