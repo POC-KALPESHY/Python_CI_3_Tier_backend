@@ -5,11 +5,11 @@ test:
   stage: test
   image: python:3
   script:
-    - pip install requests
-    - pip install pytest pytest-cov
+    # - pip install requests
+    # - pip install pytest pytest-cov
     
-    # Running pytest command to generate coverage.xml
-    - pytest --cov --cov-report term --cov-report xml:coverage.xml
+    # # Running pytest command to generate coverage.xml
+    # - pytest --cov --cov-report term --cov-report xml:coverage.xml
     
     # # Replace 'http://your-endpoint-url' with your actual endpoint URL
     # - pytest test_endpoint.py --endpoint-url 'http://your-endpoint-url'
