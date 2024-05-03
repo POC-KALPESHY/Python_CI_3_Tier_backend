@@ -11,4 +11,4 @@ test:
   artifacts:
     reports:
       junit: test/test-reports/TEST-ApiTest-20240503121624.xml
-      coverage: coverage.xml
+      # coverage: coverage.xml
