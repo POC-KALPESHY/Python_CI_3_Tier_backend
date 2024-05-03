@@ -6,7 +6,7 @@ test:
   image: python:3
   script:
     - pip install pytest pytest-cov
-    - pytest --cov --cov-report term --cov-report xml:coverage.xml test/test.py
+    - pytest --cov --cov-report term --cov-report xml:coverage.xml test/newspaper_test.py
   coverage: /TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/
   artifacts:
     reports:
