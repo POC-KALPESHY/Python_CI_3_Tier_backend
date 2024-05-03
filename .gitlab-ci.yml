@@ -5,21 +5,15 @@ test:
   stage: test
   image: python:3
   script:
-    # - pip install requests
-    - pip install pytest pytest-cov
-    
-    # # Running pytest command to generate coverage.xml
-    # - pytest --cov --cov-report term --cov-report xml:coverage.xml
-    
-    # # Replace 'http://your-endpoint-url' with your actual endpoint URL
+    - pip install requests pytest pytest-cov
+    - pytest --cov --cov-report term --cov-report xml:coverage.xml
+    # Uncommented the above line to generate coverage.xml
     # - pytest test_endpoint.py --endpoint-url 'http://your-endpoint-url'
 
-  # Specifying coverage regex for GitLab to recognize coverage results
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
 
-  # Declaring artifacts to be stored, including the coverage.xml file
   artifacts:
     reports:
-      junit: test/test/report.html
+      junit: test/test/report.xml
     paths:
       - test/coverage.xml

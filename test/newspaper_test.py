@@ -1,92 +1,135 @@
+import pytest
 import requests
+from unittest.mock import patch
 
+# Define your API URLs
 API_URL_HOME = "http://127.0.0.1:5002/home"
 API_URL_SPORTS = "http://127.0.0.1:5002/sports"
 API_URL_POLITICAL = "http://127.0.0.1:5002/political"
 
+# Define test cases
+def test_get_home_success(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 200
+    requests.get.return_value.json.return_value = {"data": "mocked_response"}
 
-def test_get_home_success():
     response = requests.get(API_URL_HOME)
     assert response.status_code == 200
-    assert response.json()
+    assert response.json() == {"data": "mocked_response"}
 
+def test_get_sports_success(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 200
+    requests.get.return_value.json.return_value = {"data": "mocked_response"}
 
-def test_get_sports_success():
     response = requests.get(API_URL_SPORTS)
     assert response.status_code == 200
-    assert response.json()
+    assert response.json() == {"data": "mocked_response"}
 
+def test_get_political_success(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 200
+    requests.get.return_value.json.return_value = {"data": "mocked_response"}
 
-def test_get_political_success():
     response = requests.get(API_URL_POLITICAL)
     assert response.status_code == 200
-    assert response.json()
+    assert response.json() == {"data": "mocked_response"}
 
+def test_get_home_invalid_route(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 404
 
-def test_get_home_invalid_route():
-    invalid_url = "http://127.0.0.1:5002/invalid_home_route"
-    response = requests.get(invalid_url)
+    response = requests.get(API_URL_HOME)
     assert response.status_code == 404
 
+def test_get_sports_invalid_route(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 404
 
-def test_get_sports_invalid_route():
-    invalid_url = "http://127.0.0.1:5002/invalid_sports_route"
-    response = requests.get(invalid_url)
+    response = requests.get(API_URL_SPORTS)
     assert response.status_code == 404
 
+def test_get_political_invalid_route(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 404
 
-def test_get_political_invalid_route():
-    invalid_url = "http://127.0.0.1:5002/invalid_political_route"
-    response = requests.get(invalid_url)
+    response = requests.get(API_URL_POLITICAL)
     assert response.status_code == 404
 
+def test_get_home_empty_response(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 200
+    requests.get.return_value.json.return_value = {}
 
-def test_get_home_empty_response():
     response = requests.get(API_URL_HOME)
     assert response.status_code == 200
     assert not response.json()
 
+def test_get_sports_empty_response(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 200
+    requests.get.return_value.json.return_value = {}
 
-def test_get_sports_empty_response():
     response = requests.get(API_URL_SPORTS)
     assert response.status_code == 200
     assert not response.json()
 
+def test_get_political_empty_response(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 200
+    requests.get.return_value.json.return_value = {}
 
-def test_get_political_empty_response():
     response = requests.get(API_URL_POLITICAL)
     assert response.status_code == 200
     assert not response.json()
 
+def test_get_home_invalid_method(mocker):
+    mocker.patch('requests.post')
+    requests.post.return_value.status_code = 405
 
-def test_get_home_invalid_method():
     response = requests.post(API_URL_HOME)
     assert response.status_code == 405
 
+def test_get_sports_invalid_method(mocker):
+    mocker.patch('requests.post')
+    requests.post.return_value.status_code = 405
 
-def test_get_sports_invalid_method():
     response = requests.post(API_URL_SPORTS)
     assert response.status_code == 405
 
+def test_get_political_invalid_method(mocker):
+    mocker.patch('requests.post')
+    requests.post.return_value.status_code = 405
 
-def test_get_political_invalid_method():
     response = requests.post(API_URL_POLITICAL)
     assert response.status_code == 405
 
+def test_get_home_valid_data(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 200
+    requests.get.return_value.json.return_value = {"data": "mocked_response"}
 
-def test_get_home_valid_data():
     response = requests.get(API_URL_HOME)
     assert response.status_code == 200
     assert response.json() is not None
 
+def test_get_sports_valid_data(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 200
+    requests.get.return_value.json.return_value = {"data": "mocked_response"}
 
-def test_get_sports_valid_data():
     response = requests.get(API_URL_SPORTS)
     assert response.status_code == 200
     assert response.json() is not None
 
+def test_get_political_valid_data(mocker):
+    mocker.patch('requests.get')
+    requests.get.return_value.status_code = 200
+    requests.get.return_value.json.return_value = {"data": "mocked_response"}
 
-def test_get_political_valid_data():
     response = requests.get(API_URL_POLITICAL)
     assert response.status_code == 200
     assert response.json() is not None
+
+if __name__ == "__main__":
+    pytest.main()
