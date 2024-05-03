@@ -20,6 +20,6 @@ test:
   # Declaring artifacts to be stored, including the coverage.xml file
   artifacts:
     reports:
-      junit: test/test/report.html
+      junit: test/test/report.xml
     paths:
       - test/coverage.xml
