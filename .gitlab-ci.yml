@@ -22,4 +22,4 @@ test:
     reports:
       junit: test/test/report.html
     paths:
-      - coverage.xml
+      - test/coverage.xml
