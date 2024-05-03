@@ -7,6 +7,7 @@ test:
   script:
     - pip install requests pytest pytest-cov
     - pytest --cov --cov-report term --cov-report xml:coverage.xml
+    - pip install pytest-mock
     # Uncommented the above line to generate coverage.xml
     # - pytest test_endpoint.py --endpoint-url 'http://your-endpoint-url'
 
