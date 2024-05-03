@@ -5,13 +5,14 @@ test:
   stage: test
   image: python:3
   script:
-    - pip install requests
-    - pip install html-testRunner
+#    - pip install requests
+#    - pip install html-testRunner
+#
+#    - pip install unittest2  # Add this line
     - pip install pytest pytest-cov
-    - pip install unittest2  # Add this line
     - pip install xmlrunner
     - pytest --cov --cov-report term --cov-report xml:coverage.xml
   coverage: /TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/
   artifacts:
     reports:
-      junit: test/test-reports/TEST-ApiTest-20240503121624.xml
+      junit: test/test/report.html
