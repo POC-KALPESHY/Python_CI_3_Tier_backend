@@ -42,3 +42,21 @@ def sport_detail():
             return make_response(jsonify(sport_page_data))
     except Exception as e:
         print(e)
+
+
+@app.route("/political",methods = ['GET'])
+def political_detail():
+    # cursor, connection = get_cursor()
+    print("Inside political detail function.")
+    try:
+        if request.method == 'GET':
+            # query = """ select * from api.api_user """
+            # user_details = get_object(
+            #     query=query,
+            #     cursor=cursor
+            # )
+            political_page_data = settings.POLITICAL_PAGE_DATA
+
+            return make_response(jsonify(political_page_data))
+    except Exception as e:
+        print(e)

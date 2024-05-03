@@ -47,3 +47,24 @@ SPORT_PAGE_DATA = {
     }
   ]
 }
+
+
+POLITICAL_PAGE_DATA = {
+  "articles": [
+    {
+      "id": 1,
+      "title": "U.S. intelligence chief warns Congress of rise in cyberattacks",
+      "content": "The top U.S. intelligence official warned Congress of an alarming rise in cyberattacks at a hearing on global threats Thursday."
+    },
+    {
+      "id": 2,
+      "title": "China is an enemy of the U.S. for a growing number of Americans, Pew poll shows.",
+      "content": "Americans overwhelmingly hold an unfavorable view of China, with an increasing number labeling the nation as an enemy of the United States, according to a Pew Research Center survey released Wednesday."
+    },
+    {
+      "id": 3,
+      "title": "Why hundreds of U.S. banks may be at risk of failure.",
+      "content": "You could see some banks either fail or at least, you know, dip below their minimum capital requirements,Christopher Wolfe, managing director and head of North American banks at Fitch Ratings, told CNBC."
+    }
+  ]
+}
