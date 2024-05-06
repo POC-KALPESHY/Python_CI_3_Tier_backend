@@ -34,7 +34,7 @@ sonarcloud-analysis:
      - sonar-scanner -Dsonar.sources=src/,run.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=test/coverage.xml
 
 quality-gate-check:
- stage: analyze  # Moved to the analyze stage
+ stage: analyze  # Moved to the analyze stages
  script:
    - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$gitaction-poc7-sonarqube_python-ci-3-tier-backend >result.json
    - cat result.json
