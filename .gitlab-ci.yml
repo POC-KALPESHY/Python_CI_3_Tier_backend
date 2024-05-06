@@ -31,7 +31,7 @@ sonarcloud-analysis:
      paths:
        - .sonar/cache
    script:
-     - sonar-scanner -Dsonar.sources=src/,run.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.coverage.jacoco.xmlReportPaths=test/coverage.xml
+     - sonar-scanner -Dsonar.sources=src/,run.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=test/coverage.xml
 
 quality-gate-check:
  stage: analyze  # Moved to the analyze stage
