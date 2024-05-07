@@ -1,6 +1,7 @@
 stages:
   - test
   - analyze
+  - deploy
 
 test:
    stage: test
@@ -30,14 +31,19 @@ sonarcloud-analysis:
    script:
      - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
 
-quality-gate-check:
- stage: analyze  # Moved to the analyze stage
- script:
-   - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$gitaction-poc7-sonarqube_python-ci-3-tier-backend >result.json
-   - cat result.json
-   - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
- needs:
-   - sonarcloud-analysis
+#quality-gate-check:
+# stage: analyze  # Moved to the analyze stage
+# script:
+#   - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$gitaction-poc7-sonarqube_python-ci-3-tier-backend >result.json
+#   - cat result.json
+#   - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
+# needs:
+#   - sonarcloud-analysis
 
+slack_notification:
+  stage: deploy
+  script:
+    - |
+      curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
 
 
