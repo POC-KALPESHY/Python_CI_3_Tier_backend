@@ -9,6 +9,10 @@ API_URL_SPORTS = "http://127.0.0.1:5002/sports"
 API_URL_POLITICAL = "http://127.0.0.1:5002/political"
 
 API_TOKEN = "18c7b5ee61d32877e2b1433b1f9ab5889a952b58"
+database_url = "postgresql://neondb_owner:ev7GPAMi2oIx@ep-dark-resonance-a5rp4fs9.us-east-2.aws.neon.tech/neondb?sslmode=require"
+db_user = "neondb_owner"
+db_pwd = "ev7GPAMi2oIx"
+db_host = "ep-dark-resonance-a5rp4fs9.us-east-2.aws.neon.tech"
 
 # Define test cases
 def test_get_home_success(mocker):
