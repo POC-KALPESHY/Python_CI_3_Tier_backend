@@ -44,10 +44,7 @@ slack_notification:
   stage: deploy
   script:
     - |
-      if [ "$CI_JOB_STATUS" == "success" ]; then
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
-      else
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Failed to deploy Python Application! ❌"}' https://hooks.slack.com/services/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
-      fi
+      curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
+      
 
 
