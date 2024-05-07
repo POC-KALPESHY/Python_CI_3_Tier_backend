@@ -8,6 +8,8 @@ API_URL_HOME = "http://127.0.0.1:5002/home"
 API_URL_SPORTS = "http://127.0.0.1:5002/sports"
 API_URL_POLITICAL = "http://127.0.0.1:5002/political"
 
+API_TOKEN = "18c7b5ee61d32877e2b1433b1f9ab5889a952b58"
+
 # Define test cases
 def test_get_home_success(mocker):
     mocker.patch('requests.get')
