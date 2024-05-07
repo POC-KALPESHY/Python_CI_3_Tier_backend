@@ -3,6 +3,10 @@ stages:
   - analyze
   - deploy
 
+include:
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+
+
 test:
    stage: test
    image: python:3
