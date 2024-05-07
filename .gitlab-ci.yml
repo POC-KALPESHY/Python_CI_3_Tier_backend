@@ -1,21 +1,43 @@
 stages:
   - test
+  - analyze
 
 test:
-  stage: test
-  image: python:3
-  script:
-    - pip install pytest-mock
-    - pip install requests pytest pytest-cov
-    - pytest --cov --cov-report term --cov-report xml:coverage.xml
-    
-    # Uncommented the above line to generate coverage.xml
-    # - pytest test_endpoint.py --endpoint-url 'http://your-endpoint-url'
+   stage: test
+   image: python:3
+   script:
+     - pip install pytest-mock
+     - pip install requests pytest pytest-cov
+     - pytest --cov --cov-report term --cov-report xml:coverage.xml
 
-  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
 
-  artifacts:
-    reports:
-      junit: test/test/report.xml
-    paths:
-      - test/coverage.xml
+   artifacts:
+     reports:
+       junit: test/test/report.xml
+     paths:
+       - test/coverage.xml
+
+sonarcloud-analysis:
+   stage: analyze
+   image:
+     name: sonarsource/sonar-scanner-cli:latest
+     entrypoint: [""]
+   cache:
+     key: "${CI_JOB_NAME}"
+     paths:
+       - .sonar/cache
+   script:
+     - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
+
+quality-gate-check:
+ stage: analyze  # Moved to the analyze stage
+ script:
+   - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$gitaction-poc7-sonarqube_python-ci-3-tier-backend >result.json
+   - cat result.json
+   - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
+ needs:
+   - sonarcloud-analysis
+
+
+
