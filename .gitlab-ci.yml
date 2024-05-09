@@ -3,8 +3,13 @@ stages:
   - analyze
   - deploy
 
+variables:
+  ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
+  ARTIFACTORY_REPO: "python_3_tier-pypi-local"
+
+
 include:
-  - template: Jobs/Secret-Detection.gitlab-ci.yml
+   - template: Jobs/Secret-Detection.gitlab-ci.yml
 
 
 test:
@@ -43,6 +48,18 @@ sonarcloud-analysis:
 #   - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
 # needs:
 #   - sonarcloud-analysis
+
+publish_artifact_jfrog:
+  stage: deploy
+  script:
+    - apt update
+    - apt install -y python3-venv
+    - python3 -m venv myenv
+    - source myenv/bin/activate
+    - pip install twine
+    - twine upload --repository-url https://onkarko.jfrog.io/artifactory/api/pypi/python_3_tier-pypi src/dist/* -u onkarko@cybage.com -p cmVmdGtuOjAxOjE3NDY3NzIwMDU6cmFtRGpPMVVZOHdST0VSTGtuRHF5aElSRXFq
+    - deactivate
+
 
 slack_notification:
   stage: deploy
