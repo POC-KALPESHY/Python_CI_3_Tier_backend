@@ -1,39 +1,45 @@
 stages:
-  - test
-  - analyze
+#  - test
+#  - analyze
   - deploy
+
+variables:
+  ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
+  ARTIFACTORY_REPO: "python_3_tier-pypi-local"
+  ARTIFACTORY_ACCESS_TOKEN: "eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiJRYVJiVEV2OE44OUEtb2x3UVJXSjhTTjc5cU1Jd1JVaEJtdUwycC1ubVMwIn0eyJzdWIiOiJqZmFjQDAxaHg4N25xMXluZDFqMHltdHhydHIxbmZhL3VzZXJzL29ua2Fya28iLCJzY3AiOiJhcHBsaWVkLXBlcm1pc3Npb25zL2FkbWluIiwiYXVkIjoiKkAqIiwiaXNzIjoiamZmZUAwMWh4ODducTF5bmQxajB5bXR4cnRyMW5mYSIsImlhdCI6MTcxNTIzNTg4MiwianRpIjoiMDIxZTgxMGEtODE3NC00M2NkLWFmZjQtNzQ3YTJlNzFiMGIzIn0u1xhCFZADyKpBpwKYoTThFihvFO9FrCeb2cpcHxdfiyBBC89ZvbrUCgY1BLPV9Cr1GoChIbJvy0s46sBRlA4ZW16pyz58Dz8HIKe7-oxauXB1DmU_I1Tx0_hF7Ftf5KqXa9ZiZITUcCgkpbldht4-mFTPvhMQ6BT9DcSdS8-ubob7q7Sh1VV0ygPM0RIgJ1yYi11lPBfi0ktcgzw_YXOMXhiFzhKGYLanLJx33o-VDLZOdTYu9uggEHoo8Fansp0Gg5CmNKl8-I7Gwvv730WJub9p_mrQ4t4BATPfqLDBpo-eXu7ZE8bVOTxJxiddR2Y_76fj8qxkDfqpACd_VvECw"
+
 
 include:
   - template: Jobs/Secret-Detection.gitlab-ci.yml
 
 
-test:
-   stage: test
-   image: python:3
-   script:
-     - pip install pytest-mock
-     - pip install requests pytest pytest-cov
-     - pytest --cov --cov-report term --cov-report xml:coverage.xml
+#test:
+#   stage: test
+#   image: python:3
+#   script:
+#     - pip install pytest-mock
+#     - pip install requests pytest pytest-cov
+#     - pytest --cov --cov-report term --cov-report xml:coverage.xml
+#
+#   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+#
+#   artifacts:
+#     reports:
+#       junit: test/test/report.xml
+#     paths:
+#       - test/coverage.xml
 
-   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
-
-   artifacts:
-     reports:
-       junit: test/test/report.xml
-     paths:
-       - test/coverage.xml
-
-sonarcloud-analysis:
-   stage: analyze
-   image:
-     name: sonarsource/sonar-scanner-cli:latest
-     entrypoint: [""]
-   cache:
-     key: "${CI_JOB_NAME}"
-     paths:
-       - .sonar/cache
-   script:
-     - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
+#sonarcloud-analysis:
+#   stage: analyze
+#   image:
+#     name: sonarsource/sonar-scanner-cli:latest
+#     entrypoint: [""]
+#   cache:
+#     key: "${CI_JOB_NAME}"
+#     paths:
+#       - .sonar/cache
+#   script:
+#     - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
 
 #quality-gate-check:
 # stage: analyze  # Moved to the analyze stage
@@ -44,11 +50,23 @@ sonarcloud-analysis:
 # needs:
 #   - sonarcloud-analysis
 
-slack_notification:
+deploy:
   stage: deploy
   script:
-    - |
-      curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
+    - apt update
+    - apt install -y python3-venv
+    - python3 -m venv myenv
+    - source myenv/bin/activate
+    - pip install twine
+    - twine upload --repository-url https://onkarko.jfrog.io/artifactory/api/pypi/python_3_tier-pypi src/dist/* -u onkarko@cybage.com -p cmVmdGtuOjAxOjE3NDY3NzIwMDU6cmFtRGpPMVVZOHdST0VSTGtuRHF5aElSRXFq
+    - deactivate
+
+
+#slack_notification:
+#  stage: deploy
+#  script:
+#    - |
+#      curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
       
 
 
