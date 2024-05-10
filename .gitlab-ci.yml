@@ -72,7 +72,7 @@ publish_artifacts_package_registry:
     - python3 -m venv myenv
     - source myenv/bin/activate
     - pip install twine
-    - TWINE_PASSWORD=$API_TOKEN TWINE_USERNAME=$USERNAME twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi src/dist/*
+    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi src/dist/*
     - deactivate
   artifacts:
     paths:
