@@ -68,4 +68,16 @@ slack_notification:
       curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
       
 
-
+#publish_artifacts_package_registry:
+#  stage: deploy
+#  variables:
+#    USERNAME: "python_3_tier"
+#    API_TOKEN: "glpat-evPDHZyxDtcUs17Rd8TN"
+#  script:
+#    - apt update
+#    - apt install -y python3-venv
+#    - python3 -m venv myenv
+#    - source myenv/bin/activate
+#    - pip install twine
+#    - TWINE_PASSWORD=$API_TOKEN TWINE_USERNAME=$USERNAME twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi src/dist/*
+#    - deactivate
