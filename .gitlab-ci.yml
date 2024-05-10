@@ -65,14 +65,15 @@ publish_artifacts_package_registry:
   stage: deploy
   variables:
     USERNAME: "onkarko"
-    API_TOKEN: "glpat-evPDHZyxDtcUs17Rd8TN"
+    API_TOKEN: "${PACKAGE_REGISTERY_TOKEN}"
   script:
     - apt update
     - apt install -y python3-venv
     - python3 -m venv myenv
     - source myenv/bin/activate
     - pip install twine
-    - - TWINE_PASSWORD=$API_TOKEN TWINE_USERNAME=$USERNAME twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi src/dist/*
+    - TWINE_PASSWORD=$API_TOKEN TWINE_USERNAME=$USERNAME twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi src/dist/*
+
 
     - deactivate
   artifacts:
