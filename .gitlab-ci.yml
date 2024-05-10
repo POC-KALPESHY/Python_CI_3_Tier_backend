@@ -61,6 +61,12 @@ publish_artifact_jfrog:
     - deactivate
 
 
+slack_notification:
+  stage: deploy
+  script:
+    - |
+      curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
+      
 
 #publish_artifacts_package_registry:
 #  stage: deploy
