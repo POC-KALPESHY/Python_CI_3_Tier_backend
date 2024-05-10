@@ -65,7 +65,7 @@ publish_artifacts_package_registry:
   stage: deploy
   variables:
     USERNAME: "onkarko"
-    API_TOKEN: "${PACKAGE_REGISTERY_TOKEN}"
+    API_TOKEN: "glpat-evPDHZyxDtcUs17Rd8TN"
   script:
     - apt update
     - apt install -y python3-venv
