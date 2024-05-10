@@ -64,7 +64,7 @@ stages:
 publish_artifacts_package_registry:
   stage: deploy
   variables:
-    USERNAME: "onkarko"
+    USERNAME: "python_3_tier"
     API_TOKEN: "glpat-evPDHZyxDtcUs17Rd8TN"
   script:
     - apt update
