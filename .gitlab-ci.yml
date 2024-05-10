@@ -74,3 +74,6 @@ publish_artifacts_package_registry:
     - pip install twine
     - TWINE_PASSWORD=API_TOKEN TWINE_USERNAME=USERNAME twine upload --repository-url ${CI_API_V4_URL}/project/${CI_PROJECT_ID}/packges/pypi src/dist/*
     - deactivate
+  artifacts:
+    paths:
+      - src/dist/*
