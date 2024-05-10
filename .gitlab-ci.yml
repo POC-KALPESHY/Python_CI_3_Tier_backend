@@ -69,5 +69,5 @@ publish_artifacts_package_registry:
     - python3 -m venv myenv
     - source myenv/bin/activate
     - pip install twine
-    - twine upload dist/*
+    - twine upload src/dist/*
     - deactivate
