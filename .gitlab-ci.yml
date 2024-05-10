@@ -68,4 +68,4 @@ publish_artifacts_package_registry:
     - apk update && apk add curl
   script:
     - ls -al
-    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --header "Content-Type: multipart/form-data" --upload-file artifacts/src/dist/* "${CI_API_V4_URL}/project/{CI_PROJECT_ID}/src/dist/*" '
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --header "Content-Type: multipart/form-data" --upload-file src/dist/* "${CI_API_V4_URL}/project/{CI_PROJECT_ID}/src/dist/*" '
