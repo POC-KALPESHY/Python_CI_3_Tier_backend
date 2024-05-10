@@ -63,11 +63,9 @@ stages:
 
 publish_artifacts_package_registry:
   stage: deploy
+  image: alpine
+  before_script: 
+    - apt update && apk add curl
   script:
-    - apt update
-    - apt install -y python3-venv
-    - python3 -m venv myenv
-    - source myenv/bin/activate
-    - pip install twine
-    - twine upload src/dist/*
-    - deactivate
+    - ls -al
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file artifacts/src/dist/* "${CI_API_V4_URL}/project/{CI_PROJECT_ID}/src/dist/*" '
