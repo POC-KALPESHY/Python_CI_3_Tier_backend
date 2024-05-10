@@ -64,8 +64,12 @@ stages:
 publish_artifacts_package_registry:
   stage: deploy
   image: alpine
-  before_script: 
-    - apk update && apk add curl
+  
   script:
-    - ls -al
-    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --header "Content-Type: multipart/form-data" --upload-file src/dist/Python_3_tire_applicatoin-0.1.tar.gz '
+    - apt update
+    - apt install -y python3-venv
+    - python3 -m venv myenv
+    - source myenv/bin/activate
+    - pip install twine
+    - twine upload --repository-url ${CI_API_V4_URL}/project/${CI_PROJECT_ID}/packges/pypi src/dist/*
+    - deactivate
