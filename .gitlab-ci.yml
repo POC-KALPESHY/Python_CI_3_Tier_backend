@@ -91,14 +91,16 @@ stages:
 
 trivy_scan:
   stage: scan
-  image: debian:buster
+  image: docker:stable
   before_script:
-    - apt-get update
-    - apt-get install -y wget apt-transport-https gnupg lsb-release
+    - apt-get update && apt-get install -y wget apt-transport-https gnupg lsb-release
     - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
     - echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list
-    - apt-get update
-    - apt-get install -y trivy
+    - apt-get update && apt-get install -y trivy
 
   script:
-    - trivy repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
+    - trivy repo --format html --output trivy_report.html https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
+
+  artifacts:
+    paths:
+      - trivy_report.html
