@@ -92,7 +92,12 @@ stages:
 trivy_scan:
   stage: scan
   image: docker:stable
-  variables:
-    TRIVY_CACHE_DIR: "$CI_PROJECT_DIR/.trivy_cache"
+  before_script:
+    - sudo apt-get install wget apt-transport-https gnupg lsb-release
+    - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+    - echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+    - sudo apt-get update
+    - sudo apt-get install trivy
+
   script:
     - trivy repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
