@@ -93,4 +93,5 @@ trivy_scan:
   script:
     - apk add --no-cache curl jq
     - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
-    - trivy --quiet --exit-code 1 --severity HIGH,CRITICAL https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
+    - trivy --quiet --severity HIGH,CRITICAL https://gitlab.com/gitlab_advance1/python_ci_3_tier.git | tee trivy_scan_report.json
+    - if jq -e '.[0].Vulnerabilities | length > 0' trivy_scan_report.json; then exit 1; fi
