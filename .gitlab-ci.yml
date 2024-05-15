@@ -98,10 +98,11 @@ trivy_scan:
     - apt-key add /tmp/trivy_repo_key
     - echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | tee -a /etc/apt/sources.list.d/trivy.list
     - apt-get update && apt-get install -y trivy
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl
 
   script:
-    - trivy repo --format html --output trivy_report.html https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
+    - trivy fs . -f json --ignore-unfixed --vuln-type os,library --format template --template "@./html.tpl" -o trivy-scan.html https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
 
   artifacts:
     paths:
-      - trivy_report.html
+      - trivy-scan.html
