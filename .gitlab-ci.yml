@@ -104,8 +104,19 @@ trivy_scan:
     - trivy repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
     - trivy --format json --output trivy_report.json repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
 
-
   artifacts:
     paths:
       - trivy_report.json
+
+trivy_html_conversion:
+  stage: post_scan
+  image: debian:buster
+  before_script:
+    - apt-get update
+    - apt-get install -y trivy
+  script:
+    - trivy2html -o trivy_report.html trivy_report.json
+  artifacts:
+    paths:
+      - trivy_report.html
 
