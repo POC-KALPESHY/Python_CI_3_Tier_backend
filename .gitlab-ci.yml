@@ -4,6 +4,7 @@ stages:
   - analyze
   - deploy
   - scan
+  - post_scan
 
 #variables:
 #  ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
