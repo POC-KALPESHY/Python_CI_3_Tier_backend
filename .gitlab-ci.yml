@@ -3,7 +3,7 @@ stages:
   - test
   - analyze
   - deploy
-  - docker_image_scan
+  - scan
 
 #variables:
 #  ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
@@ -95,4 +95,4 @@ trivy_scan:
   variables:
     TRIVY_CACHE_DIR: "$CI_PROJECT_DIR/.trivy_cache"
   script:
-    - $ trivy repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
+    - trivy repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
