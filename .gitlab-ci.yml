@@ -119,6 +119,9 @@ trivy_html_conversion:
     - echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list
     - apt-get update
     - apt-get install -y trivy
+    
+    - apt-get install -y python3-pip  # Install pip for Python package management
+    - pip3 install trivy2html 
   script:
     - trivy2html -o trivy_report.html trivy_report.json
   artifacts:
