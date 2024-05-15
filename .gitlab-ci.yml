@@ -107,5 +107,5 @@ trivy_scan:
 
   artifacts:
     paths:
-      - trivy_report.html
+      - trivy_report.json
 
