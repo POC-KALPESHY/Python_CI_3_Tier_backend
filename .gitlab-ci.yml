@@ -94,5 +94,4 @@ trivy_scan:
     - apk add --no-cache curl
     - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
     - trivy --cache-dir $TRIVY_CACHE_DIR --severity HIGH,CRITICAL --exit-code 1 .
-  only:
-    - master  # Run only on the master branch, adjust as needed
+  
