@@ -3,6 +3,7 @@ stages:
   - test
   - analyze
   - deploy
+  - docker_image_scan
 
 #variables:
 #  ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
@@ -89,9 +90,7 @@ stages:
 
 docker_build:
   # image: docker:latest 
-  stage: docker_build
-  tags: 
-    - runner-scan
+  stage: build
   script:
     - docker build -t abhishek_sportsclub .
 
