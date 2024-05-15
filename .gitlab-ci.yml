@@ -96,8 +96,6 @@ docker_build:
 
 docker_image_scan:
   stage: docker_image_scan
-  tags: 
-    - runner-scan
   script:
   - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl
   # - trivy image abhishek_sportsclub -f json --ignore-unfixed --vuln-type os,library --format template --template "@./html.tpl" -o docker_image_scan.html
