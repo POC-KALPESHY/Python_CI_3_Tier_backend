@@ -111,18 +111,18 @@ trivy_scan:
 
 trivy_html_conversion:
   stage: post_scan
-  image: node:latest
+  image: debian:buster
   before_script:
     - apt-get update
-    - apt-get install -y wget apt-transport-https gnupg lsb-release
+    - apt-get install -y wget apt-transport-https gnupg lsb-release jq pandoc
     - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
     - echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list
     - apt-get update
     - apt-get install -y trivy
-    - npm install -g trivy-html-reporter
   script:
     - trivy image --format json --output trivy_report.json debian:buster
-    - trivy-html-reporter -i trivy_report.json -o trivy_report.html
+    - cat trivy_report.json | jq -r '[.Results[] | {Target, Vulnerabilities}]' > trivy_report_filtered.json
+    - pandoc trivy_report_filtered.json -f json -t html -o trivy_report.html
   artifacts:
     paths:
       - trivy_report.html
