@@ -132,7 +132,7 @@ stages:
 # variables:
 #   SYNK_TOKEN: "61dcc41d-6777-4e11-bbbb-fd85a7422fb9"
 
-gemnasium-maven-dependency_scanning:
+synk-scan:
   image: node:latest
   stage: synk_scan
   services:
@@ -141,12 +141,9 @@ gemnasium-maven-dependency_scanning:
     - apt-get update
     - apt-get install default-jdk -y
   script:
-    # Install npm, snyk, and maven
     - npm install -g npm@latest
     - npm install -g snyk
     - npm install maven
     - npm install python3
-    # Run snyk auth, snyk monitor, snyk test to break build and out report
     - snyk auth $SNYK_TOKEN
-    # - chmod +x mvnw
     - snyk test
