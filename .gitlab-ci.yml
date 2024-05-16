@@ -7,45 +7,45 @@ stages:
   - deploy
   - notify
 
-variables:
-  ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
-  ARTIFACTORY_REPO: "python_3_tier-pypi-local"
+#variables:
+#  ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
+#  ARTIFACTORY_REPO: "python_3_tier-pypi-local"
 
 
-include:
-   - template: Jobs/Secret-Detection.gitlab-ci.yml
-   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-   - template: Jobs/SAST.gitlab-ci.yml
+#include:
+#   - template: Jobs/Secret-Detection.gitlab-ci.yml
+#   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+#   - template: Jobs/SAST.gitlab-ci.yml
 
 
 
-test:
-   stage: test
-   image: python:3
-   script:
-     - pip install pytest-mock
-     - pip install requests pytest pytest-cov
-     - pytest --cov --cov-report term --cov-report xml:coverage.xml
+#test:
+#   stage: test
+#   image: python:3
+#   script:
+#     - pip install pytest-mock
+#     - pip install requests pytest pytest-cov
+#     - pytest --cov --cov-report term --cov-report xml:coverage.xml
+#
+#   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+#
+#   artifacts:
+#     reports:
+#       junit: test/test/report.xml
+#     paths:
+#       - test/coverage.xml
 
-   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
-
-   artifacts:
-     reports:
-       junit: test/test/report.xml
-     paths:
-       - test/coverage.xml
-
-sonarcloud-analysis:
-   stage: analyze
-   image:
-     name: sonarsource/sonar-scanner-cli:latest
-     entrypoint: [""]
-   cache:
-     key: "${CI_JOB_NAME}"
-     paths:
-       - .sonar/cache
-   script:
-     - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
+#sonarcloud-analysis:
+#   stage: analyze
+#   image:
+#     name: sonarsource/sonar-scanner-cli:latest
+#     entrypoint: [""]
+#   cache:
+#     key: "${CI_JOB_NAME}"
+#     paths:
+#       - .sonar/cache
+#   script:
+#     - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
 
 #quality-gate-check:
 # stage: analyze  # Moved to the analyze stage
@@ -56,56 +56,56 @@ sonarcloud-analysis:
 # needs:
 #   - sonarcloud-analysis
 
-trivy_scan:
-  stage: scan
-  image: debian:buster
-  before_script:
-    - apt-get update
-    - apt-get install -y wget apt-transport-https gnupg lsb-release
-    - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
-    - echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list
-    - apt-get update
-    - apt-get install -y trivy
+#trivy_scan:
+#  stage: scan
+#  image: debian:buster
+#  before_script:
+#    - apt-get update
+#    - apt-get install -y wget apt-transport-https gnupg lsb-release
+#    - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
+#    - echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list
+#    - apt-get update
+#    - apt-get install -y trivy
+#
+#  script:
+#    - trivy repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
+#    - trivy --format json --output trivy_report.json repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
+#
+#  artifacts:
+#    paths:
+#      - trivy_report.json
 
-  script:
-    - trivy repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
-    - trivy --format json --output trivy_report.json repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
+#trivy_html_conversion:
+#  stage: post_scan
+#  image: debian:buster
+#  before_script:
+#    - apt-get update
+#    - apt-get install -y wget apt-transport-https gnupg lsb-release jq
+#  script:
+#    - |
+#      cat trivy_report.json | jq -r '[
+#        "<html><body><table border=\"1\">",
+#        "<tr><th>Target</th><th>Vulnerability ID</th><th>Severity</th><th>Description</th></tr>",
+#        (.Results[] |
+#          .Vulnerabilities[]? |
+#          "<tr><td>\(.Target)</td><td>\(.VulnerabilityID)</td><td>\(.Severity)</td><td>\(.Description)</td></tr>"
+#        ),
+#        "</table></body></html>"
+#      ] | .[]' > trivy_report.html
+#  artifacts:
+#    paths:
+#      - trivy_report.html
 
-  artifacts:
-    paths:
-      - trivy_report.json
-
-trivy_html_conversion:
-  stage: post_scan
-  image: debian:buster
-  before_script:
-    - apt-get update
-    - apt-get install -y wget apt-transport-https gnupg lsb-release jq
-  script:
-    - |
-      cat trivy_report.json | jq -r '[
-        "<html><body><table border=\"1\">",
-        "<tr><th>Target</th><th>Vulnerability ID</th><th>Severity</th><th>Description</th></tr>",
-        (.Results[] | 
-          .Vulnerabilities[]? | 
-          "<tr><td>\(.Target)</td><td>\(.VulnerabilityID)</td><td>\(.Severity)</td><td>\(.Description)</td></tr>"
-        ),
-        "</table></body></html>"
-      ] | .[]' > trivy_report.html
-  artifacts:
-    paths:
-      - trivy_report.html
-
-publish_artifact_jfrog:
-  stage: deploy
-  script:
-    - apt update
-    - apt install -y python3-venv
-    - python3 -m venv myenv
-    - source myenv/bin/activate
-    - pip install twine
-    - twine upload --repository-url https://onkarko.jfrog.io/artifactory/api/pypi/python_3_tier-pypi src/dist/* -u onkarko@cybage.com -p cmVmdGtuOjAxOjE3NDY3NzIwMDU6cmFtRGpPMVVZOHdST0VSTGtuRHF5aElSRXFq
-    - deactivate
+#publish_artifact_jfrog:
+#  stage: deploy
+#  script:
+#    - apt update
+#    - apt install -y python3-venv
+#    - python3 -m venv myenv
+#    - source myenv/bin/activate
+#    - pip install twine
+#    - twine upload --repository-url https://onkarko.jfrog.io/artifactory/api/pypi/python_3_tier-pypi src/dist/* -u onkarko@cybage.com -p cmVmdGtuOjAxOjE3NDY3NzIwMDU6cmFtRGpPMVVZOHdST0VSTGtuRHF5aElSRXFq
+#    - deactivate
 
 
 #publish_artifacts_package_registry:
@@ -122,8 +122,18 @@ publish_artifact_jfrog:
 #    - TWINE_PASSWORD=$API_TOKEN TWINE_USERNAME=$USERNAME twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi src/dist/*
 #    - deactivate
 
-slack_notification:
-  stage: notify
+#slack_notification:
+#  stage: notify
+#  script:
+#    - |
+#      curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
+
+
+variables:
+  SYNK_TOKEN: "61dcc41d-6777-4e11-bbbb-fd85a7422fb9"
+
+synk_scan:
+  stage: synk_scan
+  image: synk/synk
   script:
-    - |
-      curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
+    - synk test --token $SYNK_TOKEN
