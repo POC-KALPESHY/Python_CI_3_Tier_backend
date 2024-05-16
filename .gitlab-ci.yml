@@ -132,7 +132,6 @@ stages:
 
 variables:
   SYNK_TOKEN: "61dcc41d-6777-4e11-bbbb-fd85a7422fb9"
-
 synk_scan:
   stage: synk_scan
   image: debian:latest
