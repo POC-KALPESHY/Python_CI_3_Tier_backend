@@ -78,6 +78,8 @@ trivy_scan:
 trivy_html_conversion:
   stage: trivy_scan
   image: debian:buster
+  needs:
+    - trivy_scan
   before_script:
     - apt-get update
     - apt-get install -y wget apt-transport-https gnupg lsb-release jq
