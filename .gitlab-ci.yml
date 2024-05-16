@@ -135,7 +135,8 @@ variables:
 
 synk_scan:
   stage: synk_scan
-  image: synk/synk
+  image:
+    name: snyk/snyk:docker
   script:
     - apt-get update && apt-get install -y curl
     - curl -L https://github.com/snyk/snyk/releases/download/v1.750.1/snyk-linux -o /usr/local/bin/snyk
