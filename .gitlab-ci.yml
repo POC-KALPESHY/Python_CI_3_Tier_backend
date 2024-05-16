@@ -111,7 +111,7 @@ trivy_scan:
 
 trivy_html_conversion:
   stage: post_scan
-  image: debian:buster
+  image: node:latest
   before_script:
     - apt-get update
     - apt-get install -y wget apt-transport-https gnupg lsb-release
@@ -119,13 +119,10 @@ trivy_html_conversion:
     - echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list
     - apt-get update
     - apt-get install -y trivy
-    - apt-get install -y python3-pip
-    - pip3 install jinja2  # Jinja2 for templating
+    - npm install -g trivy-html-reporter
   script:
     - trivy image --format json --output trivy_report.json debian:buster
-    - python3 convert_trivy_report.py trivy_report.json trivy_report.html
+    - trivy-html-reporter -i trivy_report.json -o trivy_report.html
   artifacts:
     paths:
       - trivy_report.html
-
-
