@@ -129,8 +129,8 @@ stages:
 #    - |
 #      curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
 
-variables:
-  SYNK_TOKEN: "61dcc41d-6777-4e11-bbbb-fd85a7422fb9"
+# variables:
+#   SYNK_TOKEN: "61dcc41d-6777-4e11-bbbb-fd85a7422fb9"
 
 gemnasium-maven-dependency_scanning:
   image: node:latest
