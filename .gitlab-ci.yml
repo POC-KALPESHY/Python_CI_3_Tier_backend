@@ -129,15 +129,24 @@ stages:
 #    - |
 #      curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
 
-
 variables:
   SYNK_TOKEN: "61dcc41d-6777-4e11-bbbb-fd85a7422fb9"
-synk_scan:
+    
+gemnasium-maven-dependency_scanning:
+  image: node:latest
   stage: synk_scan
-  image: debian:latest
+  services:
+  - openjdk:11-jre-slim-buster
+  before_script:
+    - apt-get update
+    - apt-get install default-jdk -y
   script:
-    - apt-get update && apt-get install -y curl
-    - curl -L https://github.com/snyk/snyk/releases/download/v1.750.1/snyk-linux -o /usr/local/bin/snyk
-    - chmod +x /usr/local/bin/snyk
-    - /usr/local/bin/snyk auth $SYNK_TOKEN
-    - /usr/local/bin/snyk test
+    # Install npm, snyk, and maven
+    - npm install -g npm@latest
+    - npm install -g snyk
+    - npm install maven
+    - npm install python3
+    # Run snyk auth, snyk monitor, snyk test to break build and out report
+    - snyk auth $SNYK_TOKEN
+    - chmod +x mvnw
+    - snyk tes
