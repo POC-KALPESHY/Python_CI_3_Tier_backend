@@ -2,8 +2,8 @@ stages:
   - build
   - test
   - analyze
-  -  scan
-  - post_scan
+  - trivy_scan
+  - synk_scan
   - deploy
   - notify
 
@@ -57,7 +57,7 @@ sonarcloud-analysis:
 #   - sonarcloud-analysis
 
 trivy_scan:
-  stage: scan
+  stage: trivy_scan
   image: debian:buster
   before_script:
     - apt-get update
@@ -76,8 +76,10 @@ trivy_scan:
       - trivy_report.json
 
 trivy_html_conversion:
-  stage: post_scan
+  stage: trivy_scan
   image: debian:buster
+  needs:
+    - trivy_scan
   before_script:
     - apt-get update
     - apt-get install -y wget apt-transport-https gnupg lsb-release jq
@@ -86,8 +88,8 @@ trivy_html_conversion:
       cat trivy_report.json | jq -r '[
         "<html><body><table border=\"1\">",
         "<tr><th>Target</th><th>Vulnerability ID</th><th>Severity</th><th>Description</th></tr>",
-        (.Results[] | 
-          .Vulnerabilities[]? | 
+        (.Results[] |
+          .Vulnerabilities[]? |
           "<tr><td>\(.Target)</td><td>\(.VulnerabilityID)</td><td>\(.Severity)</td><td>\(.Description)</td></tr>"
         ),
         "</table></body></html>"
@@ -95,6 +97,22 @@ trivy_html_conversion:
   artifacts:
     paths:
       - trivy_report.html
+
+synk-scan:
+  image: node:latest
+  stage: synk_scan
+  services:
+  - openjdk:11-jre-slim-buster
+  before_script:
+    - apt-get update
+    - apt-get install default-jdk -y
+  script:
+    - npm install -g npm@latest
+    - npm install -g snyk
+    - npm install maven
+    - npm install python3
+    - snyk auth $SNYK_TOKEN
+    - snyk test
 
 publish_artifact_jfrog:
   stage: deploy
