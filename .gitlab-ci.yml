@@ -114,11 +114,18 @@ trivy_html_conversion:
   image: debian:buster
   before_script:
     - apt-get update
-    - apt-get install -y wget apt-transport-https gnupg lsb-release jq pandoc
+    - apt-get install -y wget apt-transport-https gnupg lsb-release jq
   script:
-    - cat trivy_report.json | jq -r '[.Results[] | {Target, Vulnerabilities}]' > trivy_report_filtered.json
-    - cat trivy_report_filtered.json | jq -r 'map({Target, Vulnerabilities})' > trivy_report_cleaned.json
-    - echo "<html><body><pre>$(cat trivy_report_cleaned.json)</pre></body></html>" > trivy_report.html
+    - |
+      cat trivy_report.json | jq -r '[
+        "<html><body><table border=\"1\">",
+        "<tr><th>Target</th><th>Vulnerability ID</th><th>Severity</th><th>Description</th></tr>",
+        (.Results[] | 
+          .Vulnerabilities[]? | 
+          "<tr><td>\(.Target)</td><td>\(.VulnerabilityID)</td><td>\(.Severity)</td><td>\(.Description)</td></tr>"
+        ),
+        "</table></body></html>"
+      ] | .[]' > trivy_report.html
   artifacts:
     paths:
       - trivy_report.html
