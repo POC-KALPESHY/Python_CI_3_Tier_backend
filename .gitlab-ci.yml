@@ -131,7 +131,7 @@ stages:
 
 variables:
   SYNK_TOKEN: "61dcc41d-6777-4e11-bbbb-fd85a7422fb9"
-    
+
 gemnasium-maven-dependency_scanning:
   image: node:latest
   stage: synk_scan
@@ -149,4 +149,4 @@ gemnasium-maven-dependency_scanning:
     # Run snyk auth, snyk monitor, snyk test to break build and out report
     - snyk auth $SNYK_TOKEN
     - chmod +x mvnw
-    - snyk tes
+    - snyk test
