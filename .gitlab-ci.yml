@@ -4,6 +4,7 @@ stages:
   - analyze
   -  scan
   - post_scan
+  - synk_scan
   - deploy
   - notify
 
