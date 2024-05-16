@@ -148,5 +148,5 @@ gemnasium-maven-dependency_scanning:
     - npm install python3
     # Run snyk auth, snyk monitor, snyk test to break build and out report
     - snyk auth $SNYK_TOKEN
-    - chmod +x mvnw
+    # - chmod +x mvnw
     - snyk test
