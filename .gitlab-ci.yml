@@ -118,7 +118,8 @@ test:
 export-merged-sbom:
   image: alpine:latest  # Use Alpine Linux as the base image
   before_script:
-     apk add --update jq curl
+     - apk add --no-cache --upgrade bash 
+     - apk add --update jq curl
   stage: sbom
   script:
     - |
