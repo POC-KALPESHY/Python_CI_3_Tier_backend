@@ -120,6 +120,7 @@ export-merged-sbom:
   before_script:
      - apk add --no-cache --upgrade bash 
      - apk add --update jq curl
+     -  dos2unix export.sh
   stage: sbom
   script:
     - |
