@@ -124,7 +124,7 @@ export-merged-sbom:
     - |
       curl --header "Authorization: Bearer $PRIVATE_TOKEN" \
       --output export.sh --url "https://gitlab.com/api/v4/snippets/3711053/raw"
-    - dos2unix export.sh  # Convert to Unix-style line endings
+    # - dos2unix export.sh  # Convert to Unix-style line endings
     - chmod +x export.sh  # Make the script executable
     - /bin/sh export.sh  # Execute the scripts
   artifacts:
