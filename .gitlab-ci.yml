@@ -122,8 +122,9 @@ export-merged-sbom:
   stage: sbom
   script:
     - |
-      curl --header "Authorization: Bearer $PRIVATE_TOKEN"
-      --output export.sh --url "https://gitlab.com/api/v4/snippets/3711053/raw"
+      curl --header "Authorization: Bearer $PRIVATE_TOKEN" \
+           --output export.sh \
+           --url "https://gitlab.com/api/v4/snippets/3711053/raw"
     - /bin/sh export.sh
   artifacts:
     paths:
