@@ -122,9 +122,27 @@ export-merged-sbom:
   stage: sbom
   script:
     - |
+      # Download the export script
       curl --header "Authorization: Bearer $PRIVATE_TOKEN" \
-      --output export.sh --url "https://gitlab.com/api/v4/snippets/<SNIPPET_ID>/raw"
-    - /bin/sh export.sh
+           --output export.sh --url "https://gitlab.com/api/v4/snippets/<SNIPPET_ID>/raw"
+      
+      # Check if the file was downloaded successfully
+      if [ ! -f export.sh ]; then
+        echo "Failed to download export.sh script"
+        exit 1
+      fi
+      
+      # Make the script executable (optional but recommended)
+      chmod +x export.sh
+
+      # Execute the script
+      /bin/sh export.sh  # Alternatively: ./export.sh if made executable
+
+      # Verify if the script ran successfully
+      if [ $? -ne 0 ]; then
+        echo "export.sh script execution failed"
+        exit 1
+      fi
   artifacts:
     paths:
       - "gl-sbom-merged-*.cdx.json"
