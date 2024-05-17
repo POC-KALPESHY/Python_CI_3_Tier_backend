@@ -118,16 +118,19 @@ test:
 export-merged-sbom:
   image: alpine:latest  # Use Alpine Linux as the base image
   before_script:
-    - apk add --update jq curl  # Install jq and curl using apk
+    - apk add --update jq curl dos2unix  # Install jq, curl, and dos2unix using apk
   stage: sbom
   script:
     - |
       curl --header "Authorization: Bearer $PRIVATE_TOKEN" \
       --output export.sh --url "https://gitlab.com/api/v4/snippets/3711053/raw"
-    - /bin/sh export.sh
+    - dos2unix export.sh  # Convert to Unix-style line endings
+    - chmod +x export.sh  # Make the script executable
+    - /bin/sh export.sh  # Execute the script
   artifacts:
     paths:
       - "gl-sbom-merged-*.cdx.json"
+
 
 #publish_artifact_jfrog:
 #  stage: deploy
