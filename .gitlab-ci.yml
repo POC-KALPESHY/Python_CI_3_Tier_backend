@@ -126,7 +126,7 @@ export-merged-sbom:
       curl --header "Authorization: Bearer $PRIVATE_TOKEN" \
            --output export.sh \
            --url "https://gitlab.com/api/v4/snippets/3711053/raw"
-    -  chmod +x your_script.sh
+    -  chmod +x export.sh
     - /bin/sh export.sh
   artifacts:
     paths:
