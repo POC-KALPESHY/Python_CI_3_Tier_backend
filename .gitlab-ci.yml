@@ -126,7 +126,7 @@ export-merged-sbom:
       --output export.sh --url "https://gitlab.com/api/v4/snippets/3711053/raw"
     - dos2unix export.sh  # Convert to Unix-style line endings
     - chmod +x export.sh  # Make the script executable
-    - /bin/sh export.sh  # Execute the script
+    - /bin/sh export.sh  # Execute the scripts
   artifacts:
     paths:
       - "gl-sbom-merged-*.cdx.json"
