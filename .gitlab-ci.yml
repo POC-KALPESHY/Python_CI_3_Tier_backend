@@ -116,17 +116,19 @@ test:
 #    - snyk test
 
 export-merged-sbom:
+  image: alpine:latest  # Use Alpine Linux as the base image
   before_script:
-    - apk add --update jq curl
+    - apk add --update jq curl  # Install jq and curl using apk
   stage: sbom
   script:
     - |
-      curl --header "Authorization: Bearer $PRIVATE_TOKEN"
+      curl --header "Authorization: Bearer $PRIVATE_TOKEN" \
       --output export.sh --url "https://gitlab.com/api/v4/snippets/<SNIPPET_ID>/raw"
     - /bin/sh export.sh
   artifacts:
     paths:
       - "gl-sbom-merged-*.cdx.json"
+
 
 #publish_artifact_jfrog:
 #  stage: deploy
