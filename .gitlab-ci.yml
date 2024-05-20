@@ -119,15 +119,12 @@ export-merged-sbom:
   image: alpine:latest  # Use Alpine Linux as the base image
   before_script:
      - apk add --no-cache --upgrade bash 
-     - apk add --update jq curl dos2unix  # Install dos2unix
   stage: sbom
   script:
     - |
       curl --header "Authorization: Bearer $PRIVATE_TOKEN" \
            --output export.sh \
            --url "https://gitlab.com/api/v4/snippets/3711053/raw"
-    - dos2unix export.sh  # Convert the script file to Unix-style line endings
-    - chmod +x export.sh
     - /bin/sh export.sh
   artifacts:
     paths:
