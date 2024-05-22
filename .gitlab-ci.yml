@@ -117,7 +117,7 @@ trivy_html_conversion:
 
 synk-scan:
   image: node:latest
-  stage: snyk_scan
+  stage: synk_scan
   services:
   - openjdk:11-jre-slim-buster
   before_script:
@@ -139,7 +139,7 @@ synk-scan:
 
 
 snyk_html_conversion:
-  stage: snyk_scan
+  stage: synk_scan
   image: debian:buster
   before_script:
     - apt-get update
