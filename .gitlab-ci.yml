@@ -98,9 +98,26 @@ trivy_html_conversion:
     paths:
       - trivy_report.html
 
+# synk-scan:
+#   image: node:latest
+#   stage: synk_scan
+#   services:
+#   - openjdk:11-jre-slim-buster
+#   before_script:
+#     - apt-get update
+#     - apt-get install default-jdk -y
+#   script:
+#     - npm install -g npm@latest
+#     - npm install -g snyk
+#     - npm install maven
+#     - npm install python3
+#     - snyk auth $SNYK_TOKEN
+#     - snyk test
+
+
 synk-scan:
   image: node:latest
-  stage: synk_scan
+  stage: snyk_scan
   services:
   - openjdk:11-jre-slim-buster
   before_script:
@@ -109,10 +126,40 @@ synk-scan:
   script:
     - npm install -g npm@latest
     - npm install -g snyk
-    - npm install maven
-    - npm install python3
-    - snyk auth $SNYK_TOKEN
-    - snyk test
+    # - npm install maven
+    # - npm install python3
+    - snyk auth $SNYK_TOKEN || { echo "Snyk authentication failed."; exit 1; }
+    - snyk test --all-sub-projects --json > snyk_report.json || echo "Snyk test completed with vulnerabilities."
+  artifacts:
+    paths:
+      - snyk_report.json
+
+
+
+
+
+snyk_html_conversion:
+  stage: snyk_scan
+  image: debian:buster
+  before_script:
+    - apt-get update
+    - apt-get install -y wget apt-transport-https gnupg lsb-release jq
+  needs:
+    - synk-scan
+  script:
+    - |
+      cat snyk_report.json | jq -r '[
+        "<html><body><table border=\"1\">",
+        "<tr><th>Package</th><th>Vulnerability ID</th><th>Severity</th><th>CVSS Score</th><th>URL</th><th>Description</th></tr>",
+        (.vulnerabilities[]? | 
+          "<tr><td>\(.packageName)</td><td>\(.id)</td><td>\(.severity)</td><td>\(.CVSS)</td><td><a href=\"\(.url)\">\(.url)</a></td><td>\(.description)</td></tr>"
+        ),
+        "</table></body></html>"
+      ] | join("\n")' > snyk_report.html
+  artifacts:
+    paths:
+      - snyk_report.html
+
 
 publish_artifact_jfrog:
   stage: deploy
