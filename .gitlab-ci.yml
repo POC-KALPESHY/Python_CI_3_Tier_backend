@@ -238,5 +238,4 @@ notify:
       Build completed successfully
       EOF
     - msmtp -a default recipient@example.com < email.txt
-  only:
-    - master
+  
