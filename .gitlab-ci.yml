@@ -200,7 +200,7 @@ notify:
     - apt-get update -y && apt-get install -y ssmtp
     - |
       echo "root=postmaster
-      mailhub=smtp.172.27.59.76:25
+      mailhub=smtp.https://webmail.evolvingsols.com/owa:25
       AuthUser=onkarko@evolvingsols.com
       AuthPass=Cybage@87654321
       UseSTARTTLS=YES
