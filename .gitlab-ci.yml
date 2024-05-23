@@ -194,23 +194,8 @@ stages:
 #       curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
 
 
+
 notify:
-  stage: notify
-  script:
-    - apt-get update -y && apt-get install -y ssmtp
-    - |
-      echo "root=postmaster
-      mailhub=smtp.webmail.evolvingsols.com:25
-      AuthUser=onkarko@evolvingsols.com
-      AuthPass=Cybage@87654321
-      UseSTARTTLS=YES
-      UseTLS=YES" > /etc/ssmtp/ssmtp.conf
-    - |
-      echo "To:onkarko@evolvingsols.com
-      From: onkarko@evolvingsols.com
-      Subject: Build Notification
-      
-      Build completed successfully" | ssmtp recipient@example.comnotify:
   stage: notify
   image: alpine
   script:
@@ -226,8 +211,10 @@ notify:
       host           smtp.webmail.evolvingsols.com
       port           587
       from           sender@example.com
-      user           $SMTP_USER
-      password       $SMTP_PASS
+      user           onkarko@evolvingsols.com
+      password       Cybage@87654321
 
       account default : default" > /etc/msmtprc
     - echo "Build completed successfully" | msmtp -a default -t recipient@example.com -s "Build Notification"
+  only:
+    - master
