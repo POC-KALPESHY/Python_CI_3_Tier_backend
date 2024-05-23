@@ -216,5 +216,4 @@ notify:
 
       account default : default" > /etc/msmtprc
     - echo "Build completed successfully" | msmtp -a default -t recipient@example.com -s "Build Notification"
-  only:
-    - master
+ 
