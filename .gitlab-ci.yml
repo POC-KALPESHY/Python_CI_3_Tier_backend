@@ -204,8 +204,8 @@ notify:
       mailhub=smtp.172.27.172.202:25
       AuthUser=onkarko@evolvingsols.com
       AuthPass=Cybage@87654321
-      UseSTARTTLS=YES
-      UseTLS=YES" > /etc/ssmtp/ssmtp.conf
+      # UseSTARTTLS=YES
+      # UseTLS=YES" > /etc/ssmtp/ssmtp.conf
     - |
       echo "To:onkarko@evolvingsols.com
       From: onkarko@evolvingsols.com
