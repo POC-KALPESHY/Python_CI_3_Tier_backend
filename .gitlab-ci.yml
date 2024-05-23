@@ -195,13 +195,26 @@ stages:
 
 
 
+stages:
+  - build
+  - notify
+
+build:
+  stage: build
+  script:
+    - echo "This is the build stage"
+  artifacts:
+    paths:
+      - build_artifact.txt
+
 notify:
   stage: notify
   image: alpine
   script:
     - apk update && apk add msmtp
     - |
-      echo "defaults
+      cat <<EOF > /etc/msmtprc
+      defaults
       auth           on
       tls            on
       tls_trust_file /etc/ssl/certs/ca-certificates.crt
@@ -210,10 +223,20 @@ notify:
       account        default
       host           smtp.webmail.evolvingsols.com
       port           587
-      from           sender@example.com
+      from           onkarko@evolvingsols.com
       user           onkarko@evolvingsols.com
       password       Cybage@87654321
 
-      account default : default" > /etc/msmtprc
-    - echo "Build completed successfully" | msmtp -a default -t recipient@example.com -s "Build Notification"
- 
+      account default : default
+      EOF
+    - |
+      cat <<EOF > email.txt
+      To: recipient@example.com
+      From: sender@example.com
+      Subject: Build Notification
+
+      Build completed successfully
+      EOF
+    - msmtp -a default recipient@example.com < email.txt
+  only:
+    - master
