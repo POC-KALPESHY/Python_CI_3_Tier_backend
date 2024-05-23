@@ -195,20 +195,15 @@ stages:
 
 
 
-notify:
+
+notify_job:
   stage: notify
   script:
-    - apt-get update -y && apt-get install -y ssmtp
-    - |
-      echo "root=postmaster
-      mailhub=smtp.172.27.172.202:25
-      AuthUser=onkarko@evolvingsols.com
-      AuthPass=Cybage@87654321
-      # UseSTARTTLS=YES
-      # UseTLS=YES" > /etc/ssmtp/ssmtp.conf
-    - |
-      echo "To:onkarko@evolvingsols.com
-      From: onkarko@evolvingsols.com
-      Subject: Build Notification
-      
-      Build completed successfully" | ssmtp recipient@example.com
+    - >
+      echo -e "Subject: Build Status Notification\n\nThe build job has $CI_JOB_STATUS" | sendmail -v \
+      -r "onkarko@evolvingsols.com" \
+      -S 172.27.172.202:25 \
+      -au"$SMTP_USERNAME" \
+      -ap"$SMTP_PASSWORD" \
+      recipient@example.com
+  
