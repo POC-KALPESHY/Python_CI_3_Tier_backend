@@ -198,12 +198,8 @@ stages:
 
 notify_job:
   stage: notify
+  image: python:3.8
   script:
-    - >
-      echo -e "Subject: Build Status Notification\n\nThe build job has $CI_JOB_STATUS" | sendmail -v \
-      -r "onkarko@evolvingsols.com" \
-      -S 172.27.172.202:25 \
-      -au"$SMTP_USERNAME" \
-      -ap"$SMTP_PASSWORD" \
-      recipient@example.com
-  
+    - pip install --upgrade pip
+    - pip install smtplib
+    - python send_email.py 
