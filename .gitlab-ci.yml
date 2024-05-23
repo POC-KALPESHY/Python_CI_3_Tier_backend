@@ -195,47 +195,20 @@ stages:
 
 
 
-stages:
-  - build
-  - notify
-
-build:
-  stage: build
-  script:
-    - echo "This is the build stage"
-  artifacts:
-    paths:
-      - build_artifact.txt
-
 notify:
   stage: notify
-  image: alpine
   script:
-    - apk update && apk add msmtp
+    - apt-get update -y && apt-get install -y ssmtp
     - |
-      cat <<EOF > /etc/msmtprc
-      defaults
-      auth           on
-      tls            on
-      tls_trust_file /etc/ssl/certs/ca-certificates.crt
-      logfile        /tmp/msmtp.log
-
-      account        default
-      host           smtp.webmail.evolvingsols.com
-      port           587
-      from           onkarko@evolvingsols.com
-      user           onkarko@evolvingsols.com
-      password       Cybage@87654321
-
-      account default : default
-      EOF
+      echo "root=postmaster
+      mailhub=smtp.172.27.172.202:25
+      AuthUser=onkarko@evolvingsols.com
+      AuthPass=Cybage@87654321
+      UseSTARTTLS=YES
+      UseTLS=YES" > /etc/ssmtp/ssmtp.conf
     - |
-      cat <<EOF > email.txt
-      To: recipient@example.com
-      From: sender@example.com
+      echo "To:onkarko@evolvingsols.com
+      From: onkarko@evolvingsols.com
       Subject: Build Notification
-
-      Build completed successfully
-      EOF
-    - msmtp -a default recipient@example.com < email.txt
-  
+      
+      Build completed successfully" | ssmtp recipient@example.com
