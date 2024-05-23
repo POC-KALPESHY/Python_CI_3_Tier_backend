@@ -210,4 +210,24 @@ notify:
       From: onkarko@evolvingsols.com
       Subject: Build Notification
       
-      Build completed successfully" | ssmtp recipient@example.com
+      Build completed successfully" | ssmtp recipient@example.comnotify:
+  stage: notify
+  image: alpine
+  script:
+    - apk update && apk add msmtp
+    - |
+      echo "defaults
+      auth           on
+      tls            on
+      tls_trust_file /etc/ssl/certs/ca-certificates.crt
+      logfile        /tmp/msmtp.log
+
+      account        default
+      host           smtp.webmail.evolvingsols.com
+      port           587
+      from           sender@example.com
+      user           $SMTP_USER
+      password       $SMTP_PASS
+
+      account default : default" > /etc/msmtprc
+    - echo "Build completed successfully" | msmtp -a default -t recipient@example.com -s "Build Notification"
