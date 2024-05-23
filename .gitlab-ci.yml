@@ -202,4 +202,4 @@ notify_job:
   script:
     # - pip install --upgrade pip
     # - pip install smtplib
-    - python send_email.py 
+    - python send_email.py  "$CI_JOB_STATUS"
