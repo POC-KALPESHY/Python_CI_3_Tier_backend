@@ -4,12 +4,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def send_email(status):
-    sender = "onkarko@evolvingsols.com"
+    sender = "username@outlook.com"
     recipient = ["onkarko@evolvingsols.com"]
     SUBJECT = "Build Status Notification"
-    smtpserver = "172.27.172.202"
-    port = 587  # Common port for STARTTLS
-    senderpassword = "Cybage@87654321"
+    smtpserver = "smtp-mail.outlook.com"
+    port = 587
+    senderpassword = "password"
 
     if status == "success":
         TEXT = """
@@ -54,5 +54,5 @@ def send_email(status):
 
 if __name__ == "__main__":
     import sys
-    status =  "success"
+    status = "success"
     send_email(status)
