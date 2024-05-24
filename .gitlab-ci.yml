@@ -200,6 +200,9 @@ notify_job:
   stage: notify
   image: python:3.8
   script:
-    # - pip install --upgrade pip
-    # - pip install smtplib
-    - python send_email.py 
+    - apt-get update
+    - apt-get install -y iputils-ping telnet
+    - ping -c 4 172.27.172.202
+    - telnet 172.27.172.202 587
+    - pip install --upgrade pip
+    - python send_email.py
