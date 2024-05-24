@@ -201,5 +201,5 @@ notify_job:
   image: python:3.8
   script:
     # - pip install --upgrade pip
-    # - pip install smtplib
+    - pip install smtplib
     - python send_email.py  "success"
