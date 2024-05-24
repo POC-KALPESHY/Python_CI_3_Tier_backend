@@ -1,30 +1,58 @@
 import smtplib
+import ssl
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 def send_email(status):
-    sender_email = "onkarko@evolvingsols.com"
-    receiver_email = "recipient@example.com"
-    server_ip = "172.27.172.202"
-    server_port = 25
-    smtp_username = "onkarko@evolvingsols.com"
-    smtp_password = "Cybage@87654321"
+    sender = "onkarko@evolvingsols.com"
+    recipient = ["onkarko@evolvingsols.com"]
+    SUBJECT = "Build Status Notification"
+    smtpserver = "172.27.172.202"
+    port = 587  # Common port for STARTTLS
+    senderpassword = "Cybage@87654321"
 
-    message = MIMEText(f"The build job has {status}")
-    message["Subject"] = "Build Status Notification"
-    message["From"] = sender_email
-    message["To"] = receiver_email
+    if status == "success":
+        TEXT = """
+            <html style="font-family:Calibri">
+            <body>
+            <div>
+                Dear User,<br/><br/>
+                All the stages in the pipeline are successfully passed. Hence, the pipeline is successfully completed.
+            </div>
+            <br/>
+            Note: This is a system generated mail. Please do not reply to this mail. In case of queries, please feel free to contact
+            <a href="mailto:onkarko@evolvingsols.com">Support</a>.
+            <div>
+            <br/>Thank You.<br/>
+            </div>
+            <br/>
+            </body>
+            </html>
+            """
+    else:
+        TEXT = f"The build job has {status}"
+    email_message = MIMEMultipart('alternative')
+    email_message['From'] = sender
+    email_message['To'] = ",".join(recipient)
+    email_message['Subject'] = SUBJECT
+    message_body = MIMEText(TEXT, 'html')
+    email_message.attach(message_body)
+
+    SSL_context = ssl.create_default_context()
+    SSL_context.check_hostname = False
+    SSL_context.verify_mode = ssl.CERT_NONE
 
     try:
-        server = smtplib.SMTP(server_ip, server_port)
-        server.login(smtp_username, smtp_password)
-        server.sendmail(sender_email, receiver_email, message.as_string())
+        with smtplib.SMTP(smtpserver, port) as server:
+            server.starttls(context=SSL_context)
+            server.login(sender, senderpassword)
+            server.sendmail(sender, recipient, email_message.as_string())
         print("Email sent successfully")
     except Exception as e:
-        print(f"Error sending email: {e}")
-    finally:
-        server.quit()
+        err_msg = f'Error: unable to send email: {e}'
+        print(err_msg)
 
 if __name__ == "__main__":
     import sys
-    status = sys.argv[1]
+    status =  "success"
     send_email(status)
