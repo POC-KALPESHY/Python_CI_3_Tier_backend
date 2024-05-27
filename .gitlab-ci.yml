@@ -224,7 +224,7 @@ variables:
 upload_to_nexus:
   stage: upload
   script:
-    - cd src  # Move to the src directory where setup.py is located
+    # - cd src  # Move to the src directory where setup.py is located
     - pip install twine
     # - python setup.py sdist
     # - echo "Uploading distribution to Nexus repository..."
