@@ -231,7 +231,7 @@ upload_to_nexus:
     # - echo "Username: $NEXUS_USERNAME"
     # - echo "Password: ********"  # Masking password for security
     # - echo "Repository URL: $NEXUS_REPO_URL"
-    - twine upload --repository-url $NEXUS_REPO_URL --username $NEXUS_USERNAME --password $NEXUS_PASSWORD src/dist/Python_3_tire_applicatoin-0.1.tar.gz
+    - twine upload --repository-url $NEXUS_REPO_URL --username $NEXUS_USERNAME --password $NEXUS_PASSWORD src/dist/*
   artifacts:
     paths:
       - src/dist/*  # Adjust the path to the built distribution
