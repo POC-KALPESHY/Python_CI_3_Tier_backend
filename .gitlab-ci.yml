@@ -194,21 +194,44 @@ stages:
 #     - |
 #       curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
 
+# image: python:latest  # Use a Python Docker image
+
+# variables:
+#   NEXUS_REPO_URL: "http://172.27.59.174:8081/repository/Python_CI_3_Tier_backend/"
+
+# # stages:
+# #   - upload
+
+# upload_to_nexus:
+#   stage: upload
+#   script:
+#     - pip install twine
+#     # - python setup.py sdist
+#     - twine upload --repository-url $NEXUS_REPO_URL src/dist/*
+#   artifacts:
+#     paths:
+#       - src/dist/*
+
 image: python:latest  # Use a Python Docker image
 
 variables:
   NEXUS_REPO_URL: "http://172.27.59.174:8081/repository/Python_CI_3_Tier_backend/"
+  NEXUS_USERNAME: "admin"  # Your Nexus username
+  NEXUS_PASSWORD: "Nexus@123"  # Your Nexus password
 
-# stages:
-#   - upload
+
 
 upload_to_nexus:
   stage: upload
   script:
+    - cd src  # Move to the src directory where setup.py is located
     - pip install twine
     # - python setup.py sdist
-    - twine upload --repository-url $NEXUS_REPO_URL src/dist/*
+    # - echo "Uploading distribution to Nexus repository..."
+    # - echo "Username: $NEXUS_USERNAME"
+    # - echo "Password: ********"  # Masking password for security
+    # - echo "Repository URL: $NEXUS_REPO_URL"
+    - twine upload --repository-url $NEXUS_REPO_URL --username $NEXUS_USERNAME --password $NEXUS_PASSWORD dist/*
   artifacts:
     paths:
-      - src/dist/*
-
+      - src/dist/*  # Adjust the path to the built distribution
