@@ -47,14 +47,14 @@ sonarcloud-analysis:
    script:
      - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
 
-#quality-gate-check:
-# stage: analyze  # Moved to the analyze stage
-# script:
-#   - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$gitaction-poc7-sonarqube_python-ci-3-tier-backend >result.json
-#   - cat result.json
-#   - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
-# needs:
-#   - sonarcloud-analysis
+quality-gate-check:
+  stage: analyze  # Moved to the analyze stage
+  script:
+    - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$gitaction-poc7-sonarqube_python-ci-3-tier-backend >result.json
+    - cat result.json
+    - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
+  needs:
+    - sonarcloud-analysis
 
 trivy_scan:
   stage: trivy_scan
@@ -161,16 +161,16 @@ snyk_html_conversion:
       - snyk_report.html
 
 
-publish_artifact_jfrog:
-  stage: deploy
-  script:
-    - apt update
-    - apt install -y python3-venv
-    - python3 -m venv myenv
-    - source myenv/bin/activate
-    - pip install twine
-    - twine upload --repository-url https://onkarko.jfrog.io/artifactory/api/pypi/python_3_tier-pypi src/dist/* -u onkarko@cybage.com -p cmVmdGtuOjAxOjE3NDY3NzIwMDU6cmFtRGpPMVVZOHdST0VSTGtuRHF5aElSRXFq
-    - deactivate
+# publish_artifact_jfrog:
+#   stage: deploy
+#   script:
+#     - apt update
+#     - apt install -y python3-venv
+#     - python3 -m venv myenv
+#     - source myenv/bin/activate
+#     - pip install twine
+#     - twine upload --repository-url https://onkarko.jfrog.io/artifactory/api/pypi/python_3_tier-pypi src/dist/* -u onkarko@cybage.com -p cmVmdGtuOjAxOjE3NDY3NzIwMDU6cmFtRGpPMVVZOHdST0VSTGtuRHF5aElSRXFq
+#     - deactivate
 
 
 #publish_artifacts_package_registry:
