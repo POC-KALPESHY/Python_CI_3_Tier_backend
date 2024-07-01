@@ -62,3 +62,44 @@ def get_object(query, cursor, param: list = None):
         obj_dict = []
     print("get_object:{}".format(obj_dict))
     return obj_dict
+
+def dict_fetch_one(cursor):
+    """Return single rows from a cursor as a dict.
+    :param cursor: cursor object
+    :return: single row in a dict format
+    """
+    print("Inside dict_fetch_one.")
+    columns = [col[0] for col in cursor.description]
+    data_values = cursor.fetchone()
+    if not data_values:
+        return {}
+    return dict(zip(columns, data_values))
+def create_object(query, param: list, cursor):
+    """"Create object based on param list."""
+    print("Inside db function: create_object.")
+    obj_dict = {}
+    try:
+        cursor.execute(query, param)
+        if cursor.description:
+            obj_dict = dict_fetch_one(cursor)
+        is_created = True
+    except Exception as e:
+        print("Error in create query-", e)
+        is_created = False
+    print("create_object:{}".format(is_created))
+    return obj_dict, is_created
+
+def update_object(query, param: list, cursor):
+    """Update object based on given param."""
+    obj_dict = {}
+    try:
+        print("Inside db function: update_object.")
+        cursor.execute(query, param)
+        if cursor.description is not None:
+            obj_dict = dict_fetch_one(cursor)
+        is_updated = True
+    except Exception as e:
+        print("Error in update query:", e)
+        is_updated = False
+    print("outside update_object:{}".format(is_updated))
+    return obj_dict, is_updated
