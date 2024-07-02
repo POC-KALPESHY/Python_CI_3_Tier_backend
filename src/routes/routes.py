@@ -133,3 +133,19 @@ def put_records_data(id):
     except Exception as e:
         print(e)
         return make_response(jsonify({"error": str(e)}), 500)
+
+
+@app.route("/api/delete-records/<int:id>", methods=['DELETE'])
+def delete_records_data(id):
+    cursor, connection = get_cursor()
+    try:
+        if request.method == 'DELETE':
+            query = "DELETE FROM data.postdata WHERE id = %s"
+            cursor.execute(query, [id])
+            connection.commit()
+
+            response_data = {"message": "Data deleted successfully"}
+            return make_response(jsonify(response_data))
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({"error": str(e)}), 500)
