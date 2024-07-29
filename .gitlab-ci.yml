@@ -32,9 +32,11 @@ build_docker_image:
   before_script:
     - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
   script:
-    - docker build -t registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG .
-    - docker images
+    # - docker build -t registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG .
+    # - docker images
 #    - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:v1
+    - docker save -o python_ci_3_tier_$DOCKER_TAG.tar $DOCKER_REGISTRY/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
+    - ls -lh python_ci_3_tier_$DOCKER_TAG.tar 
 
 
 test:
@@ -237,8 +239,14 @@ push_docker_image:
   before_script:
     - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
   script:
-    - docker images
-    - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
+    # - docker images
+    # - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
+    - echo "Loading Docker image from tar file"
+    - ls -lh python_ci_3_tier_$DOCKER_TAG.tar  # Verify the tar file
+    - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
+    - docker images  # List images to verify load
+    - echo "Pushing Docker image with tag:$DOCKER_TAG"
+    - docker push $DOCKER_REGISTRY/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
     
 
 
