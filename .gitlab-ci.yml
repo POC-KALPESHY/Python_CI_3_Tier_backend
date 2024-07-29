@@ -12,19 +12,19 @@ variables:
   ARTIFACTORY_REPO: "python_3_tier-pypi-local"
   DOCKER_IMAGE: "python_ci_image"
   DOCKER_TAG: "latest"
-  DOCKER_REGISTRY: "registry.gitlab.com"
-  DOCKER_USER: "onkarko"
+  DOCKER_REGISTRY: $CI_REGISTRY
+  DOCKER_USER: $CI_REGISTRY_USER
   DOCKER_PASSWORD: $DOCKER_CI_TOKEN
 
 
-include:
-   - template: Jobs/Secret-Detection.gitlab-ci.yml
-   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-   - template: Jobs/SAST.gitlab-ci.yml
-   - template: Jobs/Container-Scanning.gitlab-ci.yml
+# include:
+#    - template: Jobs/Secret-Detection.gitlab-ci.yml
+#    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+#    - template: Jobs/SAST.gitlab-ci.yml
+#   - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
-build:
+build_docker_image:
   stage: build
   image: docker:latest
   services:
@@ -32,8 +32,8 @@ build:
   before_script:
     - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
   script:
-    - docker build -t registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:v1 .
-    - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:v1
+    - docker build -t registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG .
+#    - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:v1
 
 
 
@@ -229,6 +229,17 @@ snyk_html_conversion:
 #    - deactivate
 # only:
 #     - main
+
+push_docker_image:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
+  script:
+    - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
+
 
 
 slack_notification:
