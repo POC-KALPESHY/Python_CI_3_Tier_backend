@@ -10,12 +10,29 @@ stages:
 variables:
   ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
   ARTIFACTORY_REPO: "python_3_tier-pypi-local"
+  DOCKER_IMAGE: "python_ci_image"
+  DOCKER_TAG: "latest"
+  DOCKER_REGISTRY: "registry.gitlab.com"
+  DOCKER_USER: "onkarko"
+  DOCKER_PASSWORD: "glpat-VSNEePMD1Ah4xUgeA9es"
 
 
 include:
    - template: Jobs/Secret-Detection.gitlab-ci.yml
    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
    - template: Jobs/SAST.gitlab-ci.yml
+
+
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
+  script:
+    - docker build -t $DOCKER_REGISTRY/$DOCKER_IMAGE:$DOCKER_TAG .
+    - docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:$DOCKER_TAG
 
 
 
@@ -34,6 +51,9 @@ test:
        junit: test/test/report.xml
      paths:
        - test/coverage.xml
+   only:
+     - main
+
 
 sonarcloud-analysis:
    stage: analyze
@@ -79,6 +99,9 @@ trivy_scan:
   artifacts:
     paths:
       - trivy_report.json
+  only:
+    - main
+
 
 trivy_html_conversion:
   stage: trivy_scan
@@ -102,6 +125,9 @@ trivy_html_conversion:
   artifacts:
     paths:
       - trivy_report.html
+  only:
+    - main
+
 
 # synk-scan:
 #   image: node:latest
@@ -138,6 +164,9 @@ synk-scan:
   artifacts:
     paths:
       - snyk_report.json
+  only:
+    - main
+
 
 
 
@@ -164,9 +193,12 @@ snyk_html_conversion:
   artifacts:
     paths:
       - snyk_report.html
+  only:
+    - main
 
 
-# publish_artifact_jfrog:
+
+  # publish_artifact_jfrog:
 #   stage: deploy
 #   script:
 #     - apt update
