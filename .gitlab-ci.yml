@@ -14,7 +14,7 @@ variables:
   DOCKER_TAG: "latest"
   DOCKER_REGISTRY: "registry.gitlab.com"
   DOCKER_USER: "onkarko"
-  DOCKER_PASSWORD: "glpat-VSNEePMD1Ah4xUgeA9es"
+  DOCKER_PASSWORD: $DOCKER_CI_TOKEN
 
 
 include:
