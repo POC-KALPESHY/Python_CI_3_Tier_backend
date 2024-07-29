@@ -237,8 +237,9 @@ push_docker_image:
   before_script:
     - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
   script:
-    - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
     - docker images
+    - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
+    
 
 
 
