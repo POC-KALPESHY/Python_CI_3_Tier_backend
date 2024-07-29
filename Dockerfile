@@ -2,7 +2,7 @@ FROM python:3.8-slim-buster
 LABEL maintainer="onkarko"
 
 WORKDIR /python-docker
-COPY python_ci_3_tier /python-docker
+COPY . /python-docker
 
 RUN pip3 install -r requirements.txt
 
