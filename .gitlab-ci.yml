@@ -11,7 +11,7 @@ variables:
   ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
   ARTIFACTORY_REPO: "python_3_tier-pypi-local"
   DOCKER_IMAGE: "python_ci_image"
-  DOCKER_TAG: "latest"
+  DOCKER_TAG: "v2"
   DOCKER_REGISTRY: $CI_REGISTRY
   DOCKER_USER: $CI_REGISTRY_USER
   DOCKER_PASSWORD: $DOCKER_CI_TOKEN
