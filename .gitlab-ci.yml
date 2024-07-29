@@ -34,7 +34,9 @@ build_docker_image:
   script:
     - docker build -t registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG .
 #    - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:v1
-
+  artifacts:
+    paths:
+      - python_ci_3_tier:$DOCKER_TAG
 
 
 
