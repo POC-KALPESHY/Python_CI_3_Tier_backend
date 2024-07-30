@@ -39,8 +39,8 @@ build_docker_image:
   artifacts:
     paths:
       - python_ci_3_tier_$DOCKER_TAG.tar
-#  only:
-#    - main
+  only:
+    - main
 
 test:
    stage: test
@@ -57,8 +57,8 @@ test:
        junit: test/test/report.xml
      paths:
        - test/coverage.xml
-#   only:
-#     - main
+   only:
+     - main
 
 sonarcloud-analysis:
    stage: analyze
@@ -71,20 +71,20 @@ sonarcloud-analysis:
        - .sonar/cache
    script:
      - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
-#   only:
-#    - main
+   only:
+    - main
 
 
 quality-gate-check:
-  stage: analyze  # Moved to the analyze stage
+  stage: analyze
   script:
     - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$gitaction-poc7-sonarqube_python-ci-3-tier-backend >result.json
     - cat result.json
     - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
   needs:
     - sonarcloud-analysis
-#  only:
-#    - main
+  only:
+    - main
 
 trivy_scan:
   stage: trivy_scan
@@ -105,8 +105,9 @@ trivy_scan:
   artifacts:
     paths:
       - trivy_report.json
-  # only:
-  #   - main
+  only:
+     - main
+     - feature/*
 
 
 trivy_html_conversion:
@@ -131,8 +132,9 @@ trivy_html_conversion:
   artifacts:
     paths:
       - trivy_report.html
-  # only:
-  #   - main
+  only:
+     - main
+     - feature/*
 
 synk-scan:
   image: node:latest
@@ -150,8 +152,9 @@ synk-scan:
   artifacts:
     paths:
       - snyk_report.json
-  # only:
-  #   - main
+  only:
+     - main
+     - feature/*
 
 
 snyk_html_conversion:
@@ -175,8 +178,9 @@ snyk_html_conversion:
   artifacts:
     paths:
       - snyk_report.html
-  # only:
-  #   - main
+  only:
+     - main
+     - feature/*
 
 
 
@@ -218,22 +222,18 @@ push_docker_image:
   before_script:
     - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
   script:
-    # - docker images
-    # - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
     - echo "Loading Docker image from tar file"
-    - ls -lh python_ci_3_tier_$DOCKER_TAG.tar  # Verify the tar file
+    - ls -lh python_ci_3_tier_$DOCKER_TAG.tar  # verify the tar file
     - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
-    - docker images  # List images to verify load
     - echo "Pushing Docker image with tag:$DOCKER_TAG"
     - docker push $DOCKER_REGISTRY/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
-    
-
-
+  only:
+    - main
 
 slack_notification:
   stage: notify
   script:
     - |
       curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
-  # only:
-  #   - main
+  only:
+     - main
