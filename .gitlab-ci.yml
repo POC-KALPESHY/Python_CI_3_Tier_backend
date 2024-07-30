@@ -28,7 +28,7 @@ include:
 
 container_scanning:
   variables:
-    CS_IMAGE: $CONTAINER_TEST_IMAGE
+    CS_IMAGE: python_ci_3_tier:$DOCKER_TAG 
 
 
 build_docker_image:
