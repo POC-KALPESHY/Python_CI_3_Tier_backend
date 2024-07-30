@@ -2,6 +2,7 @@ stages:
   - build
   - test
   - analyze
+  - scan
   - trivy_scan
   - synk_scan
   - deploy
@@ -23,6 +24,11 @@ include:
     - template: Jobs/Dependency-Scanning.gitlab-ci.yml
     - template: Jobs/SAST.gitlab-ci.yml
     - template: Jobs/Container-Scanning.gitlab-ci.yml
+
+container_scanning:
+  stage: scan 
+  variables:
+    CS_IMAGE: https://registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:v2
 
 
 build_docker_image:
