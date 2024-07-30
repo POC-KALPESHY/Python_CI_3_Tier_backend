@@ -10,6 +10,7 @@ stages:
 variables:
   ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
   ARTIFACTORY_REPO: "python_3_tier-pypi-local"
+  TRIVY_GIT_REPO_URL: "https://gitlab.com/docker_ci_25_07/python_ci_3_tier.git"
   DOCKER_IMAGE: "python_ci_image"
   DOCKER_TAG: "v2"
   DOCKER_REGISTRY: $CI_REGISTRY
@@ -58,8 +59,8 @@ test:
        junit: test/test/report.xml
      paths:
        - test/coverage.xml
-   only:
-     - main
+  #  only:
+  #    - main
 
 
 sonarcloud-analysis:
@@ -73,8 +74,8 @@ sonarcloud-analysis:
        - .sonar/cache
    script:
      - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
-   only:
-    - main
+  #  only:
+  #   - main
 
 
 quality-gate-check:
@@ -85,8 +86,8 @@ quality-gate-check:
     - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
   needs:
     - sonarcloud-analysis
-  only:
-    - main
+  # only:
+  #   - main
 
 trivy_scan:
   stage: trivy_scan
@@ -100,14 +101,14 @@ trivy_scan:
     - apt-get install -y trivy
 
   script:
-    - trivy repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
-    - trivy --format json --output trivy_report.json repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
+    - trivy repo $TRIVY_GIT_REPO_URL
+    - trivy --format json --output trivy_report.json repo $TRIVY_GIT_REPO_URL
 
   artifacts:
     paths:
       - trivy_report.json
-  only:
-    - main
+  # only:
+  #   - main
 
 
 trivy_html_conversion:
@@ -132,8 +133,8 @@ trivy_html_conversion:
   artifacts:
     paths:
       - trivy_report.html
-  only:
-    - main
+  # only:
+  #   - main
 
 
 # synk-scan:
@@ -171,8 +172,8 @@ synk-scan:
   artifacts:
     paths:
       - snyk_report.json
-  only:
-    - main
+  # only:
+  #   - main
 
 
 
@@ -200,8 +201,8 @@ snyk_html_conversion:
   artifacts:
     paths:
       - snyk_report.html
-  only:
-    - main
+  # only:
+  #   - main
 
 
 
@@ -260,5 +261,5 @@ slack_notification:
   script:
     - |
       curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
-  only:
-    - main
+  # only:
+  #   - main
