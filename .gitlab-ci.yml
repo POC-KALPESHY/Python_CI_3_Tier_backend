@@ -10,14 +10,37 @@ stages:
 variables:
   ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
   ARTIFACTORY_REPO: "python_3_tier-pypi-local"
+  DOCKER_IMAGE: "python_ci_image"
+  DOCKER_TAG: "v2"
+  DOCKER_REGISTRY: $CI_REGISTRY
+  DOCKER_USER: $CI_REGISTRY_USER
+  DOCKER_PASSWORD: $DOCKER_CI_TOKEN
+  GITLAB_ACCESS_TOKEN: $GITLAB_PERSONAL_TOKEN
 
 
 include:
-   - template: Jobs/Secret-Detection.gitlab-ci.yml
-   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-   - template: Jobs/SAST.gitlab-ci.yml
+    - template: Jobs/Secret-Detection.gitlab-ci.yml
+    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+    - template: Jobs/SAST.gitlab-ci.yml
+#   - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
+build_docker_image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
+  script:
+    - docker build -t registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG .
+    - docker save -o python_ci_3_tier_$DOCKER_TAG.tar $DOCKER_REGISTRY/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
+    - ls -lh python_ci_3_tier_$DOCKER_TAG.tar 
+  artifacts:
+    paths:
+      - python_ci_3_tier_$DOCKER_TAG.tar
+  only:
+    - main
 
 test:
    stage: test
@@ -34,6 +57,8 @@ test:
        junit: test/test/report.xml
      paths:
        - test/coverage.xml
+   rules:
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 sonarcloud-analysis:
    stage: analyze
@@ -51,7 +76,7 @@ sonarcloud-analysis:
 
 
 quality-gate-check:
-  stage: analyze  # Moved to the analyze stage
+  stage: analyze
   script:
     - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$gitaction-poc7-sonarqube_python-ci-3-tier-backend >result.json
     - cat result.json
@@ -73,12 +98,16 @@ trivy_scan:
     - apt-get install -y trivy
 
   script:
-    - trivy repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
-    - trivy --format json --output trivy_report.json repo https://gitlab.com/gitlab_advance1/python_ci_3_tier.git
+    - export GIT_REPO_URL="https://oauth2:${GITLAB_ACCESS_TOKEN}@${GIT_REPO_URL}"
+    - trivy repo $GIT_REPO_URL
+    - trivy --format json --output trivy_report.json repo $GIT_REPO_URL
 
   artifacts:
     paths:
       - trivy_report.json
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+
 
 trivy_html_conversion:
   stage: trivy_scan
@@ -102,23 +131,8 @@ trivy_html_conversion:
   artifacts:
     paths:
       - trivy_report.html
-
-# synk-scan:
-#   image: node:latest
-#   stage: synk_scan
-#   services:
-#   - openjdk:11-jre-slim-buster
-#   before_script:
-#     - apt-get update
-#     - apt-get install default-jdk -y
-#   script:
-#     - npm install -g npm@latest
-#     - npm install -g snyk
-#     - npm install maven
-#     - npm install python3
-#     - snyk auth $SNYK_TOKEN
-#     - snyk test
-
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 synk-scan:
   image: node:latest
@@ -131,16 +145,13 @@ synk-scan:
   script:
     - npm install -g npm@latest
     - npm install -g snyk
-    # - npm install maven
-    # - npm install python3
     - snyk auth $SNYK_TOKEN || { echo "Snyk authentication failed."; exit 1; }
     - snyk test --all-sub-projects --json > snyk_report.json || echo "Snyk test completed with vulnerabilities."
   artifacts:
     paths:
       - snyk_report.json
-
-
-
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 snyk_html_conversion:
@@ -164,9 +175,12 @@ snyk_html_conversion:
   artifacts:
     paths:
       - snyk_report.html
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
-# publish_artifact_jfrog:
+
+  # publish_artifact_jfrog:
 #   stage: deploy
 #   script:
 #     - apt update
@@ -196,6 +210,21 @@ snyk_html_conversion:
 # only:
 #     - main
 
+push_docker_image:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
+  script:
+    - echo "Loading Docker image from tar file"
+    - ls -lh python_ci_3_tier_$DOCKER_TAG.tar  # verify the tar file
+    - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
+    - echo "Pushing Docker image with tag:$DOCKER_TAG"
+    - docker push $DOCKER_REGISTRY/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
+  only:
+    - main
 
 slack_notification:
   stage: notify
@@ -203,4 +232,4 @@ slack_notification:
     - |
       curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
   only:
-    - main
+     - main
