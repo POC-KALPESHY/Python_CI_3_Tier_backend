@@ -102,8 +102,9 @@ trivy_scan:
     - apt-get install -y trivy
 
   script:
-    - trivy repo $TRIVY_GIT_REPO_URL
-    - trivy --format json --output trivy_report.json repo https://gitlab.com/docker_ci_25_07/python_ci_3_tier.git
+    -   export GIT_REPO_URL="https://oauth2:glpat-9aFnygGhJBuY_Z9BDXud@gitlab.com/docker_ci_25_07/python_ci_3_tier.git"
+    - trivy repo $GIT_REPO_URL
+    - trivy --format json --output trivy_report.json repo $GIT_REPO_URL
 
   artifacts:
     paths:
