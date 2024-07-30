@@ -10,7 +10,6 @@ stages:
 variables:
   ARTIFACTORY_URL: "https://onkarko.jfrog.io/artifactory/python_3_tier-pypi-local/"
   ARTIFACTORY_REPO: "python_3_tier-pypi-local"
-  TRIVY_GIT_REPO_URL: "https://gitlab.com/docker_ci_25_07/python_ci_3_tier.git"
   DOCKER_IMAGE: "python_ci_image"
   DOCKER_TAG: "v2"
   DOCKER_REGISTRY: $CI_REGISTRY
@@ -102,7 +101,7 @@ trivy_scan:
     - apt-get install -y trivy
 
   script:
-    -   export GIT_REPO_URL="https://oauth2:glpat-9aFnygGhJBuY_Z9BDXud@gitlab.com/docker_ci_25_07/python_ci_3_tier.git"
+    - export GIT_REPO_URL="https://oauth2:${GITLAB_PERSONAL_ACCESS}@${GIT_REPO_URL}"
     - trivy repo $GIT_REPO_URL
     - trivy --format json --output trivy_report.json repo $GIT_REPO_URL
 
