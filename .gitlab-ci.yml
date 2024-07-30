@@ -15,6 +15,7 @@ variables:
   DOCKER_REGISTRY: $CI_REGISTRY
   DOCKER_USER: $CI_REGISTRY_USER
   DOCKER_PASSWORD: $DOCKER_CI_TOKEN
+  GITLAB_ACCESS_TOKEN: $GITLAB_PERSONAL_TOKEN
 
 
 # include:
@@ -101,7 +102,7 @@ trivy_scan:
     - apt-get install -y trivy
 
   script:
-    - export GIT_REPO_URL="https://oauth2:$GITLAB_PERSONAL_ACCESS@${GIT_REPO_URL}"
+    - export GIT_REPO_URL="https://oauth2:${GITLAB_ACCESS_TOKEN}@${GIT_REPO_URL}"
     - trivy repo $GIT_REPO_URL
     - trivy --format json --output trivy_report.json repo $GIT_REPO_URL
 
