@@ -3,8 +3,6 @@ stages:
   - test
   - analyze
   - scan
-  - trivy_scan
-  - synk_scan
   - deploy
   - notify
 
@@ -17,7 +15,6 @@ variables:
   DOCKER_USER: $CI_REGISTRY_USER
   DOCKER_PASSWORD: $DOCKER_CI_TOKEN
   GITLAB_ACCESS_TOKEN: $GITLAB_PERSONAL_TOKEN
-  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
 
 
 include:
@@ -25,11 +22,6 @@ include:
     - template: Jobs/Dependency-Scanning.gitlab-ci.yml
     - template: Jobs/SAST.gitlab-ci.yml
     - template: Jobs/Container-Scanning.gitlab-ci.yml
-
-container_scanning:
-  stage: scan
-  variables:
-    CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
 
 
 build_docker_image:
@@ -93,8 +85,15 @@ quality-gate-check:
   only:
     - main
 
+
+container_scanning:
+  stage: scan
+  variables:
+    CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
+
+
 trivy_scan:
-  stage: trivy_scan
+  stage: scan
   image: debian:buster
   before_script:
     - apt-get update
@@ -117,7 +116,7 @@ trivy_scan:
 
 
 trivy_html_conversion:
-  stage: trivy_scan
+  stage: scan
   image: debian:buster
   needs:
     - trivy_scan
@@ -143,7 +142,7 @@ trivy_html_conversion:
 
 synk-scan:
   image: node:latest
-  stage: synk_scan
+  stage: scan
   services:
   - openjdk:11-jre-slim-buster
   before_script:
@@ -162,7 +161,7 @@ synk-scan:
 
 
 snyk_html_conversion:
-  stage: synk_scan
+  stage: scan
   image: debian:buster
   before_script:
     - apt-get update
