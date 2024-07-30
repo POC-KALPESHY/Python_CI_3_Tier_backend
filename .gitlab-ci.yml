@@ -101,7 +101,7 @@ trivy_scan:
     - apt-get install -y trivy
 
   script:
-    - export GIT_REPO_URL="https://oauth2:${GITLAB_PERSONAL_ACCESS}@${GIT_REPO_URL}"
+    - export GIT_REPO_URL="https://oauth2:$GITLAB_PERSONAL_ACCESS@${GIT_REPO_URL}"
     - trivy repo $GIT_REPO_URL
     - trivy --format json --output trivy_report.json repo $GIT_REPO_URL
 
