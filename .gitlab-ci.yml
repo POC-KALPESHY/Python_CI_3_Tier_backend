@@ -105,9 +105,8 @@ trivy_scan:
   artifacts:
     paths:
       - trivy_report.json
-  only:
-     - main
-     - feature/*
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 trivy_html_conversion:
@@ -132,9 +131,8 @@ trivy_html_conversion:
   artifacts:
     paths:
       - trivy_report.html
-  only:
-     - main
-     - feature/*
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 synk-scan:
   image: node:latest
@@ -152,9 +150,8 @@ synk-scan:
   artifacts:
     paths:
       - snyk_report.json
-  only:
-     - main
-     - feature/*
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 snyk_html_conversion:
@@ -178,9 +175,8 @@ snyk_html_conversion:
   artifacts:
     paths:
       - snyk_report.html
-  only:
-     - main
-     - feature/*
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 
