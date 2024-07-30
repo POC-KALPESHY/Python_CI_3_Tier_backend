@@ -26,10 +26,20 @@ include:
     - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 container_scanning:
-  stage: scan 
+  stage: scan
+  image: docker:latest
+  services:
+    - docker:dind
   variables:
-    CS_IMAGE: https://registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:v2
-
+    CS_IMAGE: "registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:v2"
+    SECURE_LOG_LEVEL: debug
+  script:
+    - /analyze
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report.json
+    paths:
+      - gl-container-scanning-report.json
 
 build_docker_image:
   stage: build
