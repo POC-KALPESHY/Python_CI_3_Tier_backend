@@ -18,10 +18,10 @@ variables:
   GITLAB_ACCESS_TOKEN: $GITLAB_PERSONAL_TOKEN
 
 
-# include:
-#    - template: Jobs/Secret-Detection.gitlab-ci.yml
-#    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-#    - template: Jobs/SAST.gitlab-ci.yml
+include:
+    - template: Jobs/Secret-Detection.gitlab-ci.yml
+    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+    - template: Jobs/SAST.gitlab-ci.yml
 #   - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
@@ -33,17 +33,14 @@ build_docker_image:
   before_script:
     - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
   script:
-    # - docker build -t registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG .
-    # - docker images
-#    - docker push registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:v1
     - docker build -t registry.gitlab.com/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG .
     - docker save -o python_ci_3_tier_$DOCKER_TAG.tar $DOCKER_REGISTRY/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
     - ls -lh python_ci_3_tier_$DOCKER_TAG.tar 
   artifacts:
     paths:
       - python_ci_3_tier_$DOCKER_TAG.tar
-  only:
-    - main
+#  only:
+#    - main
 
 test:
    stage: test
@@ -60,9 +57,8 @@ test:
        junit: test/test/report.xml
      paths:
        - test/coverage.xml
-   only:
-     - main
-
+#   only:
+#     - main
 
 sonarcloud-analysis:
    stage: analyze
@@ -75,8 +71,8 @@ sonarcloud-analysis:
        - .sonar/cache
    script:
      - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
-   only:
-    - main
+#   only:
+#    - main
 
 
 quality-gate-check:
@@ -87,8 +83,8 @@ quality-gate-check:
     - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
   needs:
     - sonarcloud-analysis
-  only:
-    - main
+#  only:
+#    - main
 
 trivy_scan:
   stage: trivy_scan
@@ -138,24 +134,6 @@ trivy_html_conversion:
   # only:
   #   - main
 
-
-# synk-scan:
-#   image: node:latest
-#   stage: synk_scan
-#   services:
-#   - openjdk:11-jre-slim-buster
-#   before_script:
-#     - apt-get update
-#     - apt-get install default-jdk -y
-#   script:
-#     - npm install -g npm@latest
-#     - npm install -g snyk
-#     - npm install maven
-#     - npm install python3
-#     - snyk auth $SNYK_TOKEN
-#     - snyk test
-
-
 synk-scan:
   image: node:latest
   stage: synk_scan
@@ -167,8 +145,6 @@ synk-scan:
   script:
     - npm install -g npm@latest
     - npm install -g snyk
-    # - npm install maven
-    # - npm install python3
     - snyk auth $SNYK_TOKEN || { echo "Snyk authentication failed."; exit 1; }
     - snyk test --all-sub-projects --json > snyk_report.json || echo "Snyk test completed with vulnerabilities."
   artifacts:
@@ -176,10 +152,6 @@ synk-scan:
       - snyk_report.json
   # only:
   #   - main
-
-
-
-
 
 
 snyk_html_conversion:
