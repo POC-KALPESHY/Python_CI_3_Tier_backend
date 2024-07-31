@@ -4,6 +4,7 @@ stages:
   - analyze
   - trivy_scan
   - synk_scan
+  - docker_scan
   - deploy
   - notify
 
@@ -178,6 +179,10 @@ snyk_html_conversion:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
+container_scanning:
+   stage: docker_scan
+   variables:
+     CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
 
 
   # publish_artifact_jfrog:
@@ -210,10 +215,6 @@ snyk_html_conversion:
 # only:
 #     - main
 
-container_scanning:
-   stage: scan
-   variables:
-     CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
 
 
 push_docker_image:
