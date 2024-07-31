@@ -104,7 +104,7 @@ trivy_scan:
   before_script:
     - apk add --no-cache jq
   script:
-    - export GIT_REPO_URL="https://oauth2:${GITLAB_ACCESS_TOKEN}@${GIT_REPO_URL}"
+    - export GIT_REPO_URL="https://oauth2:${GITLAB_ACCESS_TOKEN}@${CI_REPOSITORY_URL}"
     - trivy repo --format json --output trivy_report.json $GIT_REPO_URL
     - CRITICAL_COUNT=$(jq '[.Results[].Vulnerabilities[] | select(.Severity=="CRITICAL")] | length' trivy_report.json)
     - HIGH_COUNT=$(jq '[.Results[].Vulnerabilities[] | select(.Severity=="HIGH")] | length' trivy_report.json)
@@ -118,7 +118,8 @@ trivy_scan:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
-    
+
+
 
 trivy_html_conversion:
   stage: scan
