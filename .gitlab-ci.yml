@@ -258,23 +258,21 @@ slack_notification:
 
 docker_image_scan:
   stage: docker_image_scan
-  image: ubuntu:latest
+  image: docker:latest
   services:
     - docker:dind
   before_script:
-    - apt-get update
-    - apt-get install -y wget apt-transport-https gnupg lsb-release curl
-    - curl -fsSL https://get.docker.com | sh
-    - docker --version
     - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
+    - apt-get update
+    - apt-get install -y wget apt-transport-https gnupg lsb-release
     - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
     - echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list
     - apt-get update
     - apt-get install -y trivy
     - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl
+    - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
   script:
-    - docker pull $DOCKER_REGISTRY/$DOCKER_IMAGE:$DOCKER_TAG
-    - trivy image -f json --ignore-unfixed --vuln-type os,library --format template --template "@./html.tpl" -o docker_image_scan.html $DOCKER_REGISTRY/$DOCKER_IMAGE:$DOCKER_TAG
+    - trivy image -f json --ignore-unfixed --vuln-type os,library --format template --template "@./html.tpl" -o docker_image_scan.html docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
   artifacts:
     paths:
       - docker_image_scan.html
