@@ -183,6 +183,8 @@ container_scanning:
    stage: docker_scan
    variables:
      CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
+   rules:
+     - if: '$CI_COMMIT_BRANCH == "main"'
 
 
 container_scanning_image_html_conversion:
