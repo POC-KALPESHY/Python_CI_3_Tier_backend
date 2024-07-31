@@ -22,7 +22,7 @@ include:
     - template: Jobs/Secret-Detection.gitlab-ci.yml
     - template: Jobs/Dependency-Scanning.gitlab-ci.yml
     - template: Jobs/SAST.gitlab-ci.yml
-#   - template: Jobs/Container-Scanning.gitlab-ci.yml
+    - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
 build_docker_image:
@@ -209,6 +209,12 @@ snyk_html_conversion:
 #    - deactivate
 # only:
 #     - main
+
+container_scanning:
+   stage: scan
+   variables:
+     CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
+
 
 push_docker_image:
   stage: deploy
