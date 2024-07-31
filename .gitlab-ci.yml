@@ -108,10 +108,8 @@ trivy_scan:
   artifacts:
     paths:
       - trivy_report.json
-  only:
-    - main
-  # rules:
-  #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  rules:
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 trivy_html_conversion:
@@ -136,10 +134,8 @@ trivy_html_conversion:
   artifacts:
     paths:
       - trivy_report.html
-  only:
-    - main
-  # rules:
-  #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  rules:
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 synk-scan:
   image: node:latest
@@ -157,10 +153,8 @@ synk-scan:
   artifacts:
     paths:
       - snyk_report.json
-  only:
-    - main
-  # rules:
-  #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  rules:
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 snyk_html_conversion:
@@ -184,15 +178,15 @@ snyk_html_conversion:
   artifacts:
     paths:
       - snyk_report.html
-  only:
-    - main
-  # rules:
-  #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  rules:
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 container_scanning:
    stage: docker_scan
    variables:
      CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
+   only:
+     - main
 
 
 container_scanning_image_html_conversion:
@@ -216,6 +210,8 @@ container_scanning_image_html_conversion:
   artifacts:
     paths:
       - gl-container-scanning-report.json.html
+  only:
+    - main
 
 
   # publish_artifact_jfrog:
