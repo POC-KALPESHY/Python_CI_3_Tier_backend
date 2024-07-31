@@ -39,8 +39,8 @@ build_docker_image:
   artifacts:
     paths:
       - python_ci_3_tier_$DOCKER_TAG.tar
-  only:
-    - main
+  # only:
+  #   - main
 
 test:
    stage: test
