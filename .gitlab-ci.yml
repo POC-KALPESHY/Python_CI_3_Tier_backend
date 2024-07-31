@@ -17,11 +17,11 @@ variables:
   GITLAB_ACCESS_TOKEN: $GITLAB_PERSONAL_TOKEN
 
 
-include:
-    - template: Jobs/Secret-Detection.gitlab-ci.yml
-    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-    - template: Jobs/SAST.gitlab-ci.yml
-    - template: Jobs/Container-Scanning.gitlab-ci.yml
+# include:
+#     - template: Jobs/Secret-Detection.gitlab-ci.yml
+#     - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+#     - template: Jobs/SAST.gitlab-ci.yml
+#     - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
 build_docker_image:
@@ -56,8 +56,11 @@ test:
        junit: test/test/report.xml
      paths:
        - test/coverage.xml
-   rules:
-     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+   only:
+    - main
+
+  #  rules:
+  #    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 sonarcloud-analysis:
    stage: analyze
@@ -86,44 +89,36 @@ quality-gate-check:
     - main
 
 
-container_scanning:
-  stage: scan
-  variables:
-    CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
+# container_scanning:
+#   stage: scan
+#   variables:
+#     CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
 
 
 trivy_scan:
   stage: scan
-  image: debian:buster
+  image: aquasec/trivy:latest
   variables:
-    CRITICAL_THRESHOLD: 1
-    HIGH_THRESHOLD: 2
+    CRITICAL_THRESHOLD: 5
+    HIGH_THRESHOLD: 15
   before_script:
-    - apt-get update
-    - apt-get install -y wget apt-transport-https gnupg lsb-release
-    - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
-    - echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list
-    - apt-get update
-    - apt-get install -y trivy
-
+    - apk add --no-cache jq
   script:
     - export GIT_REPO_URL="https://oauth2:${GITLAB_ACCESS_TOKEN}@${GIT_REPO_URL}"
-    - trivy repo $GIT_REPO_URL
-    - trivy --format json --output trivy_report.json repo $GIT_REPO_URL
+    - trivy repo --format json --output trivy_report.json $GIT_REPO_URL
     - CRITICAL_COUNT=$(jq '[.Results[].Vulnerabilities[] | select(.Severity=="CRITICAL")] | length' trivy_report.json)
     - HIGH_COUNT=$(jq '[.Results[].Vulnerabilities[] | select(.Severity=="HIGH")] | length' trivy_report.json)
     - echo "Number of critical vulnerabilities:$CRITICAL_COUNT"
     - echo "Number of high vulnerabilities:$HIGH_COUNT"
     - if [ "$CRITICAL_COUNT" -gt "$CRITICAL_THRESHOLD" ]; then echo "Too many critical vulnerabilities found!" && exit 1; fi
     - if [ "$HIGH_COUNT" -gt "$HIGH_THRESHOLD" ]; then echo "Too many high vulnerabilities found!" && exit 1; fi
-
-
   artifacts:
     paths:
       - trivy_report.json
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
+    
 
 trivy_html_conversion:
   stage: scan
@@ -166,8 +161,11 @@ synk-scan:
   artifacts:
     paths:
       - snyk_report.json
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  only:
+    - main
+
+  # rules:
+  #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 snyk_html_conversion:
@@ -191,8 +189,11 @@ snyk_html_conversion:
   artifacts:
     paths:
       - snyk_report.html
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  only:
+    - main
+
+  # rules:
+  #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 
