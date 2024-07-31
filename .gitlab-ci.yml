@@ -92,7 +92,7 @@ quality-gate-check:
 
 container_scanning:
   stage: scan
-  image: your-container-scanning-image
+  # image: your-container-scanning-image
   variables:
     CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
   script:
