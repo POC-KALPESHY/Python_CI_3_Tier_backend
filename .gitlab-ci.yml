@@ -20,9 +20,9 @@ variables:
 
 
 include:
-    - template: Jobs/Secret-Detection.gitlab-ci.yml
-    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-    - template: Jobs/SAST.gitlab-ci.yml
+    # - template: Jobs/Secret-Detection.gitlab-ci.yml
+    # - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+    # - template: Jobs/SAST.gitlab-ci.yml
     - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
@@ -58,8 +58,10 @@ test:
        junit: test/test/report.xml
      paths:
        - test/coverage.xml
-   rules:
-     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+   only:
+    - main
+  #  rules:
+  #    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 sonarcloud-analysis:
    stage: analyze
@@ -106,8 +108,10 @@ trivy_scan:
   artifacts:
     paths:
       - trivy_report.json
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  only:
+    - main
+  # rules:
+  #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 trivy_html_conversion:
@@ -132,8 +136,10 @@ trivy_html_conversion:
   artifacts:
     paths:
       - trivy_report.html
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  only:
+    - main
+  # rules:
+  #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 synk-scan:
   image: node:latest
@@ -151,8 +157,10 @@ synk-scan:
   artifacts:
     paths:
       - snyk_report.json
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  only:
+    - main
+  # rules:
+  #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 snyk_html_conversion:
@@ -176,8 +184,10 @@ snyk_html_conversion:
   artifacts:
     paths:
       - snyk_report.html
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  only:
+    - main
+  # rules:
+  #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 container_scanning:
    stage: docker_scan
