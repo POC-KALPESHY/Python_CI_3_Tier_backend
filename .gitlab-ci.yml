@@ -189,10 +189,33 @@ snyk_html_conversion:
   # rules:
   #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
-container_scanning:
+container_scanning_image_scan:
    stage: docker_scan
    variables:
      CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
+
+
+container_scanning_image_html_conversion:
+  stage: docker_scan
+  image: debian:buster
+  before_script:
+    - apt-get update
+    - apt-get install -y wget apt-transport-https gnupg lsb-release jq
+  needs:
+    - synk-scan
+  script:
+    - |
+      cat gl-container-scanning-report.json | jq -r '[
+        "<html><body><table border=\"1\">",
+        "<tr><th>Package</th><th>Vulnerability ID</th><th>Severity</th><th>CVSS Score</th><th>URL</th><th>Description</th></tr>",
+        (.vulnerabilities[]? | 
+          "<tr><td>\(.packageName)</td><td>\(.id)</td><td>\(.severity)</td><td>\(.CVSS)</td><td><a href=\"\(.url)\">\(.url)</a></td><td>\(.description)</td></tr>"
+        ),
+        "</table></body></html>"
+      ] | join("\n")' > gl-container-scanning-report.json.html
+  artifacts:
+    paths:
+      - gl-container-scanning-report.json.html
 
 
   # publish_artifact_jfrog:
