@@ -4,6 +4,7 @@ stages:
   - analyze
   - trivy_scan
   - synk_scan
+  - docker_scan
   - deploy
   - notify
 
@@ -22,7 +23,7 @@ include:
     - template: Jobs/Secret-Detection.gitlab-ci.yml
     - template: Jobs/Dependency-Scanning.gitlab-ci.yml
     - template: Jobs/SAST.gitlab-ci.yml
-#   - template: Jobs/Container-Scanning.gitlab-ci.yml
+    - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
 build_docker_image:
@@ -106,7 +107,7 @@ trivy_scan:
     paths:
       - trivy_report.json
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 trivy_html_conversion:
@@ -132,7 +133,7 @@ trivy_html_conversion:
     paths:
       - trivy_report.html
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 synk-scan:
   image: node:latest
@@ -151,7 +152,7 @@ synk-scan:
     paths:
       - snyk_report.json
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 snyk_html_conversion:
@@ -176,8 +177,39 @@ snyk_html_conversion:
     paths:
       - snyk_report.html
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
+container_scanning:
+   stage: docker_scan
+   variables:
+     CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
+   rules:
+     - if: '$CI_COMMIT_BRANCH == "main"'
+
+
+container_scanning_image_html_conversion:
+  stage: docker_scan
+  image: debian:buster
+  before_script:
+    - apt-get update
+    - apt-get install -y wget apt-transport-https gnupg lsb-release jq
+  needs:
+    - container_scanning
+  script:
+    - |
+      cat gl-container-scanning-report.json | jq -r '[
+        "<html><body><table border=\"1\">",
+        "<tr><th>Package</th><th>Vulnerability ID</th><th>Severity</th><th>CVSS Score</th><th>URL</th><th>Description</th></tr>",
+        (.vulnerabilities[]? | 
+          "<tr><td>\(.packageName)</td><td>\(.id)</td><td>\(.severity)</td><td>\(.CVSS)</td><td><a href=\"\(.url)\">\(.url)</a></td><td>\(.description)</td></tr>"
+        ),
+        "</table></body></html>"
+      ] | join("\n")' > gl-container-scanning-report.json.html
+  artifacts:
+    paths:
+      - gl-container-scanning-report.json.html
+  only:
+    - main
 
 
   # publish_artifact_jfrog:
@@ -209,6 +241,8 @@ snyk_html_conversion:
 #    - deactivate
 # only:
 #     - main
+
+
 
 push_docker_image:
   stage: deploy
