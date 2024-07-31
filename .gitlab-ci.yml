@@ -18,11 +18,11 @@ variables:
   GITLAB_ACCESS_TOKEN: $GITLAB_PERSONAL_TOKEN
 
 
-# include:
+include:
 #     - template: Jobs/Secret-Detection.gitlab-ci.yml
 #     - template: Jobs/Dependency-Scanning.gitlab-ci.yml
 #     - template: Jobs/SAST.gitlab-ci.yml
-#     - template: Jobs/Container-Scanning.gitlab-ci.yml
+    - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
 build_docker_image:
@@ -39,8 +39,8 @@ build_docker_image:
   artifacts:
     paths:
       - python_ci_3_tier_$DOCKER_TAG.tar
-  # only:
-  #   - main
+  only:
+    - main
 
 test:
    stage: test
@@ -90,10 +90,20 @@ quality-gate-check:
     - main
 
 
-# container_scanning:
-#   stage: scan
-#   variables:
-#     CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
+container_scanning:
+  stage: scan
+  image: your-container-scanning-image
+  variables:
+    CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
+  script:
+    - echo "Running container scanning"
+    - container-scanner scan $CS_IMAGE -o report.json
+  artifacts:
+    paths:
+      - report.json
+    reports:
+      container_scanning: report.json
+
 
 
 trivy_scan:
@@ -257,29 +267,29 @@ slack_notification:
 
 
 
-Trivy_container_scanning:
-  stage: test
-  image:
-    name: alpine:3.11
-  variables:
-    # Override the GIT_STRATEGY variable in your `.gitlab-ci.yml` file and set it to `fetch` if you want to provide a `clair-whitelist.yml`
-    # file. See https://docs.gitlab.com/ee/user/application_security/container_scanning/index.html#overriding-the-container-scanning-template
-    # for details
-    GIT_STRATEGY: none
-    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-  allow_failure: true
-  before_script:
-    - export TRIVY_VERSION=${TRIVY_VERSION:-v0.19.2}
-    - apk add --no-cache curl docker-cli
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin ${TRIVY_VERSION}
-    - curl -sSL -o /tmp/trivy-gitlab.tpl https://github.com/aquasecurity/trivy/raw/${TRIVY_VERSION}/contrib/gitlab.tpl
-  script:
-    - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
-    - trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@/tmp/trivy-gitlab.tpl" -o gl-container-scanning-report.json python_ci_3_tier:$DOCKER_TAG
-  cache:
-    paths:
-      - .trivycache/
-  artifacts:
-    reports:
-      container_scanning: gl-container-scanning-report.json
+# Trivy_container_scanning:
+#   stage: test
+#   image:
+#     name: alpine:3.11
+#   variables:
+#     # Override the GIT_STRATEGY variable in your `.gitlab-ci.yml` file and set it to `fetch` if you want to provide a `clair-whitelist.yml`
+#     # file. See https://docs.gitlab.com/ee/user/application_security/container_scanning/index.html#overriding-the-container-scanning-template
+#     # for details
+#     GIT_STRATEGY: none
+#     IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+#   allow_failure: true
+#   before_script:
+#     - export TRIVY_VERSION=${TRIVY_VERSION:-v0.19.2}
+#     - apk add --no-cache curl docker-cli
+#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#     - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin ${TRIVY_VERSION}
+#     - curl -sSL -o /tmp/trivy-gitlab.tpl https://github.com/aquasecurity/trivy/raw/${TRIVY_VERSION}/contrib/gitlab.tpl
+#   script:
+#     - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
+#     - trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@/tmp/trivy-gitlab.tpl" -o gl-container-scanning-report.json python_ci_3_tier:$DOCKER_TAG
+#   cache:
+#     paths:
+#       - .trivycache/
+#   artifacts:
+#     reports:
+#       container_scanning: gl-container-scanning-report.json
