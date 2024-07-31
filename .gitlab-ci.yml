@@ -95,6 +95,9 @@ container_scanning:
 trivy_scan:
   stage: scan
   image: debian:buster
+  variables:
+    CRITICAL_THRESHOLD: 1
+    HIGH_THRESHOLD: 2
   before_script:
     - apt-get update
     - apt-get install -y wget apt-transport-https gnupg lsb-release
@@ -107,6 +110,13 @@ trivy_scan:
     - export GIT_REPO_URL="https://oauth2:${GITLAB_ACCESS_TOKEN}@${GIT_REPO_URL}"
     - trivy repo $GIT_REPO_URL
     - trivy --format json --output trivy_report.json repo $GIT_REPO_URL
+    - CRITICAL_COUNT=$(jq '[.Results[].Vulnerabilities[] | select(.Severity=="CRITICAL")] | length' trivy_report.json)
+    - HIGH_COUNT=$(jq '[.Results[].Vulnerabilities[] | select(.Severity=="HIGH")] | length' trivy_report.json)
+    - echo "Number of critical vulnerabilities:$CRITICAL_COUNT"
+    - echo "Number of high vulnerabilities:$HIGH_COUNT"
+    - if [ "$CRITICAL_COUNT" -gt "$CRITICAL_THRESHOLD" ]; then echo "Too many critical vulnerabilities found!" && exit 1; fi
+    - if [ "$HIGH_COUNT" -gt "$HIGH_THRESHOLD" ]; then echo "Too many high vulnerabilities found!" && exit 1; fi
+
 
   artifacts:
     paths:
