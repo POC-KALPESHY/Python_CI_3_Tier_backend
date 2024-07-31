@@ -189,7 +189,7 @@ snyk_html_conversion:
   # rules:
   #   - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
-container_scanning_image_scan:
+container_scanning:
    stage: docker_scan
    variables:
      CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
@@ -202,7 +202,7 @@ container_scanning_image_html_conversion:
     - apt-get update
     - apt-get install -y wget apt-transport-https gnupg lsb-release jq
   needs:
-    - synk-scan
+    - container_scanning
   script:
     - |
       cat gl-container-scanning-report.json | jq -r '[
