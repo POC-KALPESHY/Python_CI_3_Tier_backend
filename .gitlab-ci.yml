@@ -97,7 +97,7 @@ quality-gate-check:
 
 trivy_scan:
   stage: scan
-  image: aquasec/trivy:latest
+  image: debian:buster
   variables:
     CRITICAL_THRESHOLD: 5
     HIGH_THRESHOLD: 15
