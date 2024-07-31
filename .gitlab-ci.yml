@@ -258,7 +258,7 @@ slack_notification:
 
 docker_image_scan:
   stage: docker_image_scan
-  image: docker:latest
+  image: ubuntu:latest
   services:
     - docker:dind
   before_script:
