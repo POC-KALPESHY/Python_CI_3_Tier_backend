@@ -260,6 +260,7 @@ trivy_scan_image:
   stage: scan
   image:
     name: aquasec/trivy:latest
-    entrypoint: [""]
+  before_script:
+    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
   script:
     - trivy image --no-progress docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
