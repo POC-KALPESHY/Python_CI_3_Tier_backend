@@ -258,11 +258,11 @@ slack_notification:
 
 docker_image_scan:
   stage: docker_image_scan
-  image: docker:latest
+  image: ubuntu:latest
   services:
     - docker:dind
   before_script:
-    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
+    # - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
     - apt-get update
     - apt-get install -y wget apt-transport-https gnupg lsb-release
     - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
