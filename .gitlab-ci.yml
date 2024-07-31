@@ -257,18 +257,29 @@ slack_notification:
 
 
 
-trivy:
+Trivy_container_scanning:
   stage: test
-  image: docker:stable-git
-  before_script:
-    - wget https://github.com/aquasecurity/trivy/releases/download/v0.1.6/trivy_0.1.6_Linux-64bit.tar.gz
-    - tar zxvf trivy_0.1.6_Linux-64bit.tar.gz
+  image:
+    name: alpine:3.11
   variables:
-    DOCKER_DRIVER: overlay2
+    # Override the GIT_STRATEGY variable in your `.gitlab-ci.yml` file and set it to `fetch` if you want to provide a `clair-whitelist.yml`
+    # file. See https://docs.gitlab.com/ee/user/application_security/container_scanning/index.html#overriding-the-container-scanning-template
+    # for details
+    GIT_STRATEGY: none
+    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
   allow_failure: true
-  services:
-    - docker:stable-dind
+  before_script:
+    - export TRIVY_VERSION=${TRIVY_VERSION:-v0.19.2}
+    - apk add --no-cache curl docker-cli
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin ${TRIVY_VERSION}
+    - curl -sSL -o /tmp/trivy-gitlab.tpl https://github.com/aquasecurity/trivy/raw/${TRIVY_VERSION}/contrib/gitlab.tpl
   script:
     - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
-    - ./trivy --exit-code 0 --severity HIGH --no-progress --auto-refresh python_ci_3_tier_$DOCKER_TAG
-    - ./trivy --exit-code 1 --severity CRITICAL --no-progress --auto-refresh python_ci_3_tier_$DOCKER_TAG
+    - trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@/tmp/trivy-gitlab.tpl" -o gl-container-scanning-report.json python_ci_3_tier:$DOCKER_TAG
+  cache:
+    paths:
+      - .trivycache/
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report.json
