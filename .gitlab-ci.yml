@@ -17,9 +17,9 @@ variables:
   DOCKER_USER: $CI_REGISTRY_USER
   DOCKER_PASSWORD: $DOCKER_CI_TOKEN
   GITLAB_ACCESS_TOKEN: $GITLAB_PERSONAL_TOKEN
-  NEXUS_REPO_URL: "http://172.27.59.174:8081/repository/docker_image/"
-  NEXUS_USERNAME: "admin"  # Your Nexus username
-  NEXUS_PASSWORD: "Nexus@123"  # Your Nexus password
+  NEXUS_PYTHON_REPO_URL: $NEXUS_PYTHON_REPO_URL
+  NEXUS_USERNAME: $NEXUS_USERNAME
+  NEXUS_PASSWORD: $NEXUS_PASSWORD
 
 
 
@@ -259,19 +259,33 @@ container_scanning_image_html_conversion:
 # image: python:latest  # Use a Python Docker image
 
 
-artifacts_nexus:
+upload_to_nexus:
   stage: deploy
-  image: docker:latest
-  services:
-    - name: docker:dind
-      command: ["--insecure-registry=172.27.59.174:8085"]
-  before_script:
-    - docker login -u admin -p Nexus@123 172.27.59.174:8085
+  image: python:latest
   script:
-    - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
-    - docker tag python_ci_3_tier:$DOCKER_TAG 172.27.59.174:8085/repository/docker_image/python_ci_3_tier:$DOCKER_TAG
-    - echo "Pushing Docker image with tag:$DOCKER_TAG"
-    - docker push 172.27.59.174:8085/repository/docker_image/python_ci_3_tier:$DOCKER_TAG || (echo "Push failed, retrying..."; sleep 30; docker push 172.27.59.174:8085/repository/docker_image/python_ci_3_tier:$DOCKER_TAG)
+    - pip install twine
+    - twine upload --repository-url $NEXUS_PYTHON_REPO_URL --username $NEXUS_USERNAME --password $NEXUS_PASSWORD src/dist/*
+  artifacts:
+    paths:
+      - src/dist/*
+
+
+
+
+
+# artifacts_nexus:
+#   stage: deploy
+#   image: docker:latest
+#   services:
+#     - name: docker:dind
+#       command: ["--insecure-registry=172.27.59.174:8085"]
+#   before_script:
+#     - docker login -u admin -p Nexus@123 172.27.59.174:8085
+#   script:
+#     - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
+#     - docker tag python_ci_3_tier:$DOCKER_TAG 172.27.59.174:8085/repository/docker_image/python_ci_3_tier:$DOCKER_TAG
+#     - echo "Pushing Docker image with tag:$DOCKER_TAG"
+#     - docker push 172.27.59.174:8085/repository/docker_image/python_ci_3_tier:$DOCKER_TAG || (echo "Push failed, retrying..."; sleep 30; docker push 172.27.59.174:8085/repository/docker_image/python_ci_3_tier:$DOCKER_TAG)
 
 
 
