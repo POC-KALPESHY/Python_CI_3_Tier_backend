@@ -259,15 +259,20 @@ container_scanning_image_html_conversion:
 # image: python:latest  # Use a Python Docker image
 
 
-
-
-
-upload_to_nexus:
+artifacts_nexus:
   stage: deploy
-  image: curlimages/curl:latest
+  image: docker:latest
+  services:
+    - docker:dind
+  # before_script:
+  #   - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
   script:
-    - echo "Uploading Docker tar to Nexus repository..."
-    - curl -v -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file python_ci_3_tier_$DOCKER_TAG.tar $NEXUS_REPO_URL/python_ci_3_tier_$DOCKER_TAG.tar
+    - docker login -u "$NEXUS_USERNAME" -p "$NEXUS_PASSWORD" $NEXUS_REPO_URL
+    - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
+    - docker tag python_ci_3_tier:$DOCKER_TAG  172.27.59.174:8081/repository/docker_image/python_ci_3_tier:$DOCKER_TAG
+    - docker push  172.27.59.174:8081/repository/docker_image/python_ci_3_tier:$DOCKER_TAG
+
+
 
 
 push_docker_image:
