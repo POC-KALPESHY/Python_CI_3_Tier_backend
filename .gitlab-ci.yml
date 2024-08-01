@@ -264,7 +264,7 @@ container_scanning_image_html_conversion:
 
 upload_to_nexus:
   stage: deploy
-  image: curlimages/curl:lates
+  image: curlimages/curl:latest
   script:
     - echo "Uploading Docker tar to Nexus repository..."
     - curl -v -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file python_ci_3_tier_$DOCKER_TAG.tar $NEXUS_REPO_URL/python_ci_3_tier_$DOCKER_TAG.tar
