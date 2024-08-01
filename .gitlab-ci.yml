@@ -265,15 +265,13 @@ artifacts_nexus:
   services:
     - docker:dind
   before_script:
-      # - echo "$NEXUS_PASSWORD" | docker login -u "$NEXUS_USERNAME" --password-stdin http://172.27.59.174:8081
-      - docker login -u "$NEXUS_USERNAME" -p "$NEXUS_PASSWORD" $NEXUS_REPO_URL
-
+    - echo "$NEXUS_PASSWORD" | docker login -u "$NEXUS_USERNAME" --password-stdin $NEXUS_REPO_URL
   script:
-    # - docker login -u "$NEXUS_USERNAME" -p "$NEXUS_PASSWORD" $NEXUS_REPO_URL
     - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
-    - docker tag python_ci_3_tier:$DOCKER_TAG  172.27.59.174:8081/repository/docker_image/python_ci_3_tier:$DOCKER_TAG
+    - docker tag python_ci_3_tier:$DOCKER_TAG 172.27.59.174:8081/repository/docker_image/python_ci_3_tier:$DOCKER_TAG
     - echo "Pushing Docker image with tag:$DOCKER_TAG"
-    - docker push  172.27.59.174:8081/repository/docker_image/python_ci_3_tier:$DOCKER_TAG
+    - docker push 172.27.59.174:8081/repository/docker_image/python_ci_3_tier:$DOCKER_TAG || (echo "Push failed, retrying..."; sleep 30; docker push 172.27.59.174:8081/repository/docker_image/python_ci_3_tier:$DOCKER_TAG)
+
 
 
 
