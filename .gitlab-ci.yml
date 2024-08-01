@@ -265,7 +265,7 @@ artifacts_nexus:
   services:
     - docker:dind
   before_script:
-     - docker login –u admin –password Nexus@123 172.27.59.174:8081
+     - docker login -u admin -p Nexus@123 172.27.59.174:80
     # -  echo "$NEXUS_PASSWORD" | docker login -u "$NEXUS_USERNAME" "$NEXUS_PASSWORD" 
   script:
     - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
