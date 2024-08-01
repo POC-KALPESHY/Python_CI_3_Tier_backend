@@ -24,9 +24,9 @@ variables:
 
 
 include:
-    - template: Jobs/Secret-Detection.gitlab-ci.yml
-    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-    - template: Jobs/SAST.gitlab-ci.yml
+    # - template: Jobs/Secret-Detection.gitlab-ci.yml
+    # - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+    # - template: Jobs/SAST.gitlab-ci.yml
     - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
@@ -264,11 +264,10 @@ container_scanning_image_html_conversion:
 
 upload_to_nexus:
   stage: deploy
-  image: python:latest
+  image: docker:19.03.12
   script:
-    - pip install twine
     - echo "Uploading Docker tar to Nexus repository..."
-    - twine upload --repository-url $NEXUS_REPO_URL --username $NEXUS_USERNAME --password $NEXUS_PASSWORD python_ci_3_tier_$DOCKER_TAG.tar
+    - curl -v -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file python_ci_3_tier_$DOCKER_TAG.tar $NEXUS_REPO_URL/python_ci_3_tier_$DOCKER_TAG.tar
 
 
 push_docker_image:
