@@ -17,6 +17,10 @@ variables:
   DOCKER_USER: $CI_REGISTRY_USER
   DOCKER_PASSWORD: $DOCKER_CI_TOKEN
   GITLAB_ACCESS_TOKEN: $GITLAB_PERSONAL_TOKEN
+  NEXUS_REPO_URL: "http://172.27.59.174:8081/repository/docker_image/"
+  NEXUS_USERNAME: "admin"  # Your Nexus username
+  NEXUS_PASSWORD: "Nexus@123"  # Your Nexus password
+
 
 
 include:
@@ -40,8 +44,8 @@ build_docker_image:
   artifacts:
     paths:
       - python_ci_3_tier_$DOCKER_TAG.tar
-  only:
-    - main
+#  only:
+#    - main
 
 test:
    stage: test
@@ -58,8 +62,10 @@ test:
        junit: test/test/report.xml
      paths:
        - test/coverage.xml
-   rules:
-     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+   only:
+     - main
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 sonarcloud-analysis:
    stage: analyze
@@ -106,8 +112,10 @@ trivy_scan:
   artifacts:
     paths:
       - trivy_report.json
-  rules:
-     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  only:
+    - main
+#  rules:
+#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 trivy_html_conversion:
@@ -132,8 +140,10 @@ trivy_html_conversion:
   artifacts:
     paths:
       - trivy_report.html
-  rules:
-     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  only:
+    - main
+#  rules:
+#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 synk-scan:
   image: node:latest
@@ -151,8 +161,10 @@ synk-scan:
   artifacts:
     paths:
       - snyk_report.json
-  rules:
-     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  only:
+    - main
+#  rules:
+#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 snyk_html_conversion:
@@ -176,8 +188,10 @@ snyk_html_conversion:
   artifacts:
     paths:
       - snyk_report.html
-  rules:
-     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  only:
+    - main
+#  rules:
+#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 container_scanning:
    stage: docker_scan
@@ -242,6 +256,19 @@ container_scanning_image_html_conversion:
 # only:
 #     - main
 
+image: python:latest  # Use a Python Docker image
+
+
+
+
+
+upload_to_nexus:
+  stage: upload
+  image: python:latest
+  script:
+    - pip install twine
+    - echo "Uploading Docker tar to Nexus repository..."
+    - twine upload --repository-url $NEXUS_REPO_URL --username $NEXUS_USERNAME --password $NEXUS_PASSWORD python_ci_3_tier_$DOCKER_TAG.tar
 
 
 push_docker_image:
