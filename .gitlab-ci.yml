@@ -256,14 +256,14 @@ container_scanning_image_html_conversion:
 # only:
 #     - main
 
-image: python:latest  # Use a Python Docker image
+# image: python:latest  # Use a Python Docker image
 
 
 
 
 
 upload_to_nexus:
-  stage: upload
+  stage: deploy
   image: python:latest
   script:
     - pip install twine
