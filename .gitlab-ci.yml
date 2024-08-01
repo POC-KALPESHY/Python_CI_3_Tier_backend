@@ -263,17 +263,15 @@ artifacts_nexus:
   stage: deploy
   image: docker:latest
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["--insecure-registry=172.27.59.174:8081"]
   before_script:
-     - docker login -u admin -p Nexus@123 172.27.59.174:80
-    # -  echo "$NEXUS_PASSWORD" | docker login -u "$NEXUS_USERNAME" "$NEXUS_PASSWORD" 
+    - docker login -u admin -p Nexus@123 172.27.59.174:8081
   script:
     - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
     - docker tag python_ci_3_tier:$DOCKER_TAG 172.27.59.174:8081/repository/docker_image/python_ci_3_tier:$DOCKER_TAG
     - echo "Pushing Docker image with tag:$DOCKER_TAG"
     - docker push 172.27.59.174:8081/repository/docker_image/python_ci_3_tier:$DOCKER_TAG || (echo "Push failed, retrying..."; sleep 30; docker push 172.27.59.174:8081/repository/docker_image/python_ci_3_tier:$DOCKER_TAG)
-
-
 
 
 
