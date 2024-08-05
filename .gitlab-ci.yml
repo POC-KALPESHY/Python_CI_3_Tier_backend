@@ -189,18 +189,6 @@ snyk_html_conversion:
   # rules:
   #    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
-# container_scanning:
-#    stage: docker_scan
-#    variables:
-#      CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
-#    script:
-#     - container-scanning scan $CS_IMAGE --json > gl-container-scanning-report.json
-#     - cat gl-container-scanning-report.json | jq -e '.vulnerabilities[] | select(.severity == "high" or .severity == "critical")' && exit 1 || exit 0
-  #  rules:
-  #    - if: '$CI_COMMIT_BRANCH == "main"'
-
-
-
 container_scanning:
   stage: docker_scan
   image: aquasec/trivy:latest
@@ -212,6 +200,9 @@ container_scanning:
     - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
   script:
     - trivy image --exit-code 1 --severity HIGH,CRITICAL --format json --output gl-container-scanning-report.json $CS_IMAGE
+  artifacts:
+    paths:
+      - gl-container-scanning-report.json
 
 container_scanning_image_html_conversion:
   stage: docker_scan
