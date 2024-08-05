@@ -189,7 +189,14 @@ snyk_html_conversion:
   # rules:
   #    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
+
 container_scanning:
+   stage: docker_scan
+   variables:
+     CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
+
+
+container_scanning_image:
   stage: docker_scan
   image: aquasec/trivy:latest
   variables:
