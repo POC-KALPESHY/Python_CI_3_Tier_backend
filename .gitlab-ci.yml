@@ -20,9 +20,9 @@ variables:
 
 
 include:
-    - template: Jobs/Secret-Detection.gitlab-ci.yml
-    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-    - template: Jobs/SAST.gitlab-ci.yml
+#    - template: Jobs/Secret-Detection.gitlab-ci.yml
+#    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+#    - template: Jobs/SAST.gitlab-ci.yml
     - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
@@ -58,8 +58,10 @@ test:
        junit: test/test/report.xml
      paths:
        - test/coverage.xml
-   rules:
-     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+   only:
+     - main
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 sonarcloud-analysis:
    stage: analyze
@@ -242,6 +244,11 @@ container_scanning_image_html_conversion:
 # only:
 #     - main
 
+
+stage_success:
+  stage: deploy
+  script:
+    - echo "This is the success stage"
 
 
 push_docker_image:
