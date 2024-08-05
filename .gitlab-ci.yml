@@ -213,7 +213,6 @@ container_scanning:
   script:
     - trivy image --exit-code 1 --severity HIGH,CRITICAL --format json --output gl-container-scanning-report.json $CS_IMAGE
 
-
 container_scanning_image_html_conversion:
   stage: docker_scan
   image: debian:buster
