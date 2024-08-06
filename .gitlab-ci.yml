@@ -20,9 +20,9 @@ variables:
 
 
 include:
-#    - template: Jobs/Secret-Detection.gitlab-ci.yml
-#    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-#    - template: Jobs/SAST.gitlab-ci.yml
+    - template: Jobs/Secret-Detection.gitlab-ci.yml
+    - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+    - template: Jobs/SAST.gitlab-ci.yml
     - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 
@@ -40,8 +40,8 @@ build_docker_image:
   artifacts:
     paths:
       - python_ci_3_tier_$DOCKER_TAG.tar
-  only:
-    - main
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 test:
    stage: test
@@ -60,8 +60,8 @@ test:
        - test/coverage.xml
    only:
      - main
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+   rules:
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 sonarcloud-analysis:
    stage: analyze
@@ -74,8 +74,8 @@ sonarcloud-analysis:
        - .sonar/cache
    script:
      - sonar-scanner -Dsonar.sources=src/,run.py,test/newspaper_test.py, -Dsonar.organization=gitaction-poc7-sonarqube -Dsonar.projectKey=gitaction-poc7-sonarqube_python-ci-3-tier-backend   -Dsonar.python.coverage.reportPaths=coverage.xml
-   only:
-    - main
+   rules:
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 
 quality-gate-check:
@@ -86,8 +86,8 @@ quality-gate-check:
     - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
   needs:
     - sonarcloud-analysis
-  only:
-    - main
+  rules:
+     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
 trivy_scan:
   stage: trivy_scan
@@ -108,10 +108,8 @@ trivy_scan:
   artifacts:
     paths:
       - trivy_report.json
-  only:
-    - main
-#  rules:
-#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  rules:
+     - if: '$CI_COMMIT_BRANCH == "main"'
 
 
 trivy_html_conversion:
@@ -136,10 +134,9 @@ trivy_html_conversion:
   artifacts:
     paths:
       - trivy_report.html
-  only:
-    - main
-#  rules:
-#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+
+  rules:
+     - if: '$CI_COMMIT_BRANCH == "main"'
 
 synk-scan:
   image: node:latest
@@ -157,10 +154,8 @@ synk-scan:
   artifacts:
     paths:
       - snyk_report.json
-  only:
-    - main
-#  rules:
-#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  rules:
+     - if: '$CI_COMMIT_BRANCH == "main"'
 
 
 snyk_html_conversion:
@@ -184,17 +179,15 @@ snyk_html_conversion:
   artifacts:
     paths:
       - snyk_report.html
-  only:
-    - main
-#  rules:
-#     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
+  rules:
+     - if: '$CI_COMMIT_BRANCH == "main"'
 
 container_scanning:
    stage: docker_scan
    variables:
      CS_IMAGE: $CI_REGISTRY_IMAGE:$DOCKER_TAG
-  #  rules:
-  #    - if: '$CI_COMMIT_BRANCH == "main"'
+   rules:
+      - if: '$CI_COMMIT_BRANCH == "main"'
 
 
 container_scanning_image_html_conversion:
@@ -215,13 +208,11 @@ container_scanning_image_html_conversion:
         ),
         "</table></body></html>"
       ] | join("\n")' > gl-container-scanning-report.html
-
   artifacts:
     paths:
       - gl-container-scanning-report.html
-
-#  only:
-#    - main
+  rules:
+     - if: '$CI_COMMIT_BRANCH == "main" '
 
 container_scanning_severity_check:
   stage: docker_scan
@@ -232,6 +223,8 @@ container_scanning_severity_check:
     - CRITICAL_COUNT=$(grep -o 'Critical' gl-container-scanning-report.html | wc -l)
     - echo "Number of Critical Vulnerabilities:$CRITICAL_COUNT"
     - if [ $CRITICAL_COUNT -gt 5 ]; then exit 1; fi
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" '
 
   # publish_artifact_jfrog:
 #   stage: deploy
@@ -278,13 +271,13 @@ push_docker_image:
     - docker load -i python_ci_3_tier_$DOCKER_TAG.tar
     - echo "Pushing Docker image with tag:$DOCKER_TAG"
     - docker push $DOCKER_REGISTRY/docker_ci_25_07/python_ci_3_tier:$DOCKER_TAG
-  only:
-    - main
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 slack_notification:
   stage: notify
   script:
     - |
       curl -X POST -H 'Content-type: application/json' --data '{"text":"Python Application Deployed Successfully! 🚀"}' https://hooks.slack.com/services/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
-  only:
-     - main
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" '
