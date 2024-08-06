@@ -231,7 +231,7 @@ container_scanning_severity_check:
   script:
     - CRITICAL_COUNT=$(grep -o 'Critical' gl-container-scanning-report.html | wc -l)
     - echo "Number of Critical Vulnerabilities:$CRITICAL_COUNT"
-    - if [ $CRITICAL_COUNT -gt 10 ]; then exit 1; fi
+    - if [ $CRITICAL_COUNT -gt 1 ]; then exit 1; fi
 
   # publish_artifact_jfrog:
 #   stage: deploy
