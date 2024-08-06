@@ -223,7 +223,15 @@ container_scanning_image_html_conversion:
 #  only:
 #    - main
 
-
+container_scanning_severity_check:
+  stage: docker_scan
+  image: alpine:latest
+  needs:
+    - container_scanning_image_html_conversion
+  script:
+    - CRITICAL_COUNT=$(grep -oP '(?<=Severity<\/th><th>)([^<]+)' gl-container-scanning-report.html | grep -c 'Critical')
+    - echo "Number of Critical Vulnerabilities:$CRITICAL_COUNT"
+    - if [ $CRITICAL_COUNT -gt 10 ]; then exit 1; fi
 
 
   # publish_artifact_jfrog:
