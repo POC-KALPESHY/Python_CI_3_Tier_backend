@@ -58,8 +58,6 @@ test:
        junit: test/test/report.xml
      paths:
        - test/coverage.xml
-   only:
-     - main
    rules:
      - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ /^feature\//'
 
