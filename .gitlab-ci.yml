@@ -207,16 +207,15 @@ container_scanning_image_html_conversion:
     - container_scanning
   script:
     - |
-      cat gl-container-scanning-report.json | jq -r '
-        [
-          "<html><body><table border=\"1\">",
-          "<tr><th>Package</th><th>Vulnerability ID</th><th>Severity</th><th>URL</th><th>Description</th></tr>",
-          (.[] | 
-            "<tr><td>\(.location.dependency.package.name)</td><td>\(.identifiers[] | select(.type == \"cve\").name)</td><td>\(.severity)</td><td><a href=\"\(.identifiers[] | select(.type == \"cve\").url)\">\(.identifiers[] | select(.type == \"cve\").url)</a></td><td>\(.description)</td></tr>"
-          ),
-          "</table></body></html>"
-        ] | join("\n")
-      ' > gl-container-scanning-report.json.html
+      cat gl-container-scanning-report.json | jq -r '[
+        "<html><body><table border=\"1\">",
+        "<tr><th>Package</th><th>Vulnerability ID</th><th>Severity</th><th>URL</th><th>Description</th></tr>",
+        (.vulnerabilities[] | 
+          "<tr><td>\(.location.dependency.package.name)</td><td>\(.identifiers[] | select(.type == \"cve\").name)</td><td>\(.severity)</td><td><a href=\"\(.identifiers[] | select(.type == \"cve\").url)\">\(.identifiers[] | select(.type == \"cve\").url)</a></td><td>\(.description)</td></tr>"
+        ),
+        "</table></body></html>"
+      ] | join("\n")' > gl-container-scanning-report.html
+
 
 #  only:
 #    - main
