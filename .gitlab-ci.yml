@@ -216,6 +216,9 @@ container_scanning_image_html_conversion:
         "</table></body></html>"
       ] | join("\n")' > gl-container-scanning-report.html
 
+  artifacts:
+    paths:
+      - gl-container-scanning-report.html
 
 #  only:
 #    - main
