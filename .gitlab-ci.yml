@@ -218,9 +218,20 @@ container_scanning_severity_check:
   needs:
     - container_scanning_image_html_conversion
   script:
-    - CRITICAL_COUNT=$(grep -o 'Critical' gl-container-scanning-report.html | wc -l)
-    - echo "Number of Critical Vulnerabilities:$CRITICAL_COUNT"
-    - if [ $CRITICAL_COUNT -gt 5 ]; then exit 1; fi
+    - echo "Checking HTML content for critical vulnerabilities..."
+    - |
+      if grep -q 'Critical' gl-container-scanning-report.html; then
+        CRITICAL_COUNT=$(grep -o 'Critical' gl-container-scanning-report.html | wc -l)
+        echo "Number of Critical Vulnerabilities:$CRITICAL_COUNT"
+        if [ $CRITICAL_COUNT -gt 5 ]; then
+          echo "Threshold exceeded. Failing the job."
+          exit 1
+        else
+          echo "Threshold not exceeded. Job passes."
+        fi
+      else
+        echo "No critical vulnerabilities found. Job passes."
+      fi
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" '
 
