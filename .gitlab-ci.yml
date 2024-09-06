@@ -24,5 +24,9 @@ include:
 
 code_quality:
   stage: test
+  # artifacts:
+  #   paths: [gl-code-quality-report.json]
+  variables:
+    REPORT_FORMAT: html
   artifacts:
-    paths: [gl-code-quality-report.json]
+    paths: [gl-code-quality-report.html]
