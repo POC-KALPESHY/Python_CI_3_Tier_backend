@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - code_html
   - analyze
   - trivy_scan
   - synk_scan
@@ -22,16 +23,17 @@ include:
   - template: Jobs/Code-Quality.gitlab-ci.yml
 
 
-# code_quality:
-#   stage: test
-#   # artifacts:
-#   #   paths: [gl-code-quality-report.json]
+code_quality:
+  stage: test
+  artifacts:
+    paths: [gl-code-quality-report.json]
 #   variables:
 #     REPORT_FORMAT: html
 #   artifacts:
 #     paths: [gl-code-quality-report.html]
 
 code_quality_html:
+  stage: code_html
   extends: code_quality
   variables:
     REPORT_FORMAT: html
