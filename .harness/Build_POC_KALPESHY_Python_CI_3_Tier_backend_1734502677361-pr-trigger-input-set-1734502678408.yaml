@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_POC_KALPESHY_Python_CI_3_Tier_backend_1734502677361-pr-trigger-input-set
+  identifier: Build_POC_KALPESHY_Python_CI_3_Tier_backend_1734502677361prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_POC_KALPESHY_Python_CI_3_Tier_backend_1734502677361
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
